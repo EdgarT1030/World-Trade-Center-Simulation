@@ -1,0 +1,46 @@
+[
+  {
+    "flight": "American 11North Tower",
+    "hijacked": "About 8:14",
+    "civil_aviation_knew": "8:19, a flight attendant phoned the airline",
+    "military_told": "8:37:52",
+    "crashed": "8:46:40",
+    "notice": "9 minutes. Fighters ordered up at 8:46, airborne 8:53.",
+    "sources": [
+      10
+    ]
+  },
+  {
+    "flight": "United 175South Tower",
+    "hijacked": "8:42 to 8:46",
+    "civil_aviation_knew": "8:52, a flight attendant phoned the airline",
+    "military_told": "9:03",
+    "crashed": "9:03:11",
+    "notice": "None",
+    "sources": [
+      10
+    ]
+  },
+  {
+    "flight": "American 77Pentagon",
+    "hijacked": "8:51 to 8:54",
+    "civil_aviation_knew": "9:05",
+    "military_told": "9:34, reported as lost, not as hijacked",
+    "crashed": "9:37:46",
+    "notice": "None as a hijack",
+    "sources": [
+      10
+    ]
+  },
+  {
+    "flight": "United 93Shanksville",
+    "hijacked": "9:28",
+    "civil_aviation_knew": "9:34",
+    "military_told": "10:07",
+    "crashed": "10:03:11",
+    "notice": "None. Told after the crash.",
+    "sources": [
+      10
+    ]
+  }
+]

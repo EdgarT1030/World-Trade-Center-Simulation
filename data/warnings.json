@@ -1,0 +1,172 @@
+{
+  "note": "Every entry carries the bracketed source ids used on the page; see sources.json. status is one of documented | disputed | not_supported.",
+  "before_the_attack": [
+    {
+      "when": "December 1994",
+      "known": "An Algerian group hijacks an airliner, \"most likely intending to blow it up over Paris, but possibly to crash it into the Eiffel Tower.\"",
+      "what_happened": "Cited by the Commission as a known precedent.",
+      "status": "documented",
+      "sources": [
+        11,
+        12
+      ]
+    },
+    {
+      "when": "1995",
+      "known": "After the Manila airliner plot is broken up, Abdul Hakim Murad tells Philippine authorities that he and Ramzi Yousef, the 1993 Trade Center bomber, had discussed flying a plane into CIA headquarters.",
+      "what_happened": "Cited by the Commission as known well before 2001.",
+      "status": "documented",
+      "sources": [
+        11,
+        12
+      ]
+    },
+    {
+      "when": "1998",
+      "known": "White House counterterrorism chief Richard Clarke chairs an exercise in which terrorists seize a Learjet and fly it toward a target in Washington. Threat reports that September mention \"a possible plot to fly an explosives-laden aircraft into a U.S. city.\"",
+      "what_happened": "The Commission cites both as proof the idea had been imagined inside government.",
+      "status": "documented",
+      "sources": [
+        11,
+        12
+      ]
+    },
+    {
+      "when": "December 4, 1998",
+      "known": "President Clinton's daily intelligence brief covers Bin Ladin's involvement in planning a hijack operation.",
+      "what_happened": "The Commission cites it as an early, high-level hijacking warning.",
+      "status": "documented",
+      "sources": [
+        11,
+        12
+      ]
+    },
+    {
+      "when": "August 1999",
+      "known": "The FAA's intelligence office lists a \"suicide hijacking operation\" among Bin Ladin scenarios.",
+      "what_happened": "Analysts \"judged such an operation unlikely.\"",
+      "status": "documented",
+      "sources": [
+        11,
+        12
+      ]
+    },
+    {
+      "when": "Before 2001",
+      "known": "NORAD develops exercises around aircraft used as weapons. One scenario has a hijacked airliner from overseas crashing into the Pentagon.",
+      "what_happened": "That scenario has the airliner coming from overseas, not from a U.S. airport.",
+      "status": "documented",
+      "sources": [
+        11,
+        12
+      ]
+    },
+    {
+      "when": "January to March 2000",
+      "known": "The CIA learns that Khalid al Mihdhar holds a U.S. visa, and then that Nawaf al Hazmi flew to Los Angeles on January 15, 2000. Both later hijack American 77.",
+      "what_happened": "Neither man is put on a watchlist. The FBI is not told.",
+      "status": "documented",
+      "sources": [
+        11,
+        12
+      ]
+    },
+    {
+      "when": "Spring and summer 2001",
+      "known": "Threat reporting peaks. CIA Director George Tenet later says \"the system was blinking red.\" On June 28 Clarke writes that the activity \"had reached a crescendo.\" A June 30 briefing is headed \"Bin Ladin Planning High-Profile Attacks.\"",
+      "what_happened": "Most reports point to targets overseas. They contain \"few specifics regarding time, place, method, or target.\"",
+      "status": "documented",
+      "sources": [
+        11,
+        12
+      ]
+    },
+    {
+      "when": "July 2001",
+      "known": "An FBI agent in Phoenix warns headquarters of the \"possibility of a coordinated effort by Usama Bin Ladin\" to send students to U.S. flight schools.",
+      "what_happened": "Managers at headquarters do not see the memo before September 11.",
+      "status": "documented",
+      "sources": [
+        11,
+        12
+      ]
+    },
+    {
+      "when": "July 31, 2001",
+      "known": "An FAA circular alerts airlines to \"reports of possible near-term terrorist operations\" and says some groups \"plan and train for hijackings.\"",
+      "what_happened": "The same circular says there is \"no credible evidence of specific plans to attack U.S. civil aviation.\" Of 27 FAA security briefings that summer, none covers suicide hijackings.",
+      "status": "documented",
+      "sources": [
+        11,
+        12
+      ]
+    },
+    {
+      "when": "August 6, 2001",
+      "known": "President Bush's daily brief is titled \"Bin Ladin Determined to Strike in US.\" It says al Qaeda members have lived in or travelled to the U.S. and notes FBI reports of activity consistent with preparations for hijackings, including surveillance of federal buildings in New York. [14]",
+      "what_happened": "The brief stayed classified until April 10, 2004.",
+      "status": "documented",
+      "sources": [
+        11,
+        12
+      ]
+    },
+    {
+      "when": "August 15 to 17, 2001",
+      "known": "Flight student Zacarias Moussaoui is arrested in Minnesota. Agents believe he is \"an Islamic extremist preparing for some future act.\" One supervisor says he is \"trying to keep someone from taking a plane and crashing into the World Trade Center.\"",
+      "what_happened": "FBI headquarters disagrees with the Minneapolis agents and does not approve their warrant application.",
+      "status": "documented",
+      "sources": [
+        11,
+        12
+      ]
+    },
+    {
+      "when": "August 23, 2001",
+      "known": "Tenet is briefed under the heading \"Islamic Extremist Learns to Fly.\"",
+      "what_happened": "He sees no al Qaeda connection at the time.",
+      "status": "documented",
+      "sources": [
+        11,
+        12
+      ]
+    },
+    {
+      "when": "August 24, 2001",
+      "known": "Mihdhar and Hazmi are finally watchlisted. Both are already in the country.",
+      "what_happened": "The search goes to one FBI agent as a \"Routine\" lead. He sends a lead to Los Angeles on September 11.",
+      "status": "documented",
+      "sources": [
+        11,
+        12
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claim": "Someone bet on airline stocks falling",
+      "on_record": "Trading in put options on United and American did spike on September 6 and 10. The Commission reports that \"a single U.S.-based institutional investor with no conceivable ties to al Qaeda purchased 95 percent of the UAL puts on September 6,\" and that much of the American trading traced to an options newsletter faxed to subscribers on September 9. Its conclusion: \"the apparently suspicious consistently proved innocuous.\" [15]",
+      "status": "not_supported"
+    },
+    {
+      "claim": "A military data-mining unit had identified Mohamed Atta in 2000",
+      "on_record": "Lt. Col. Anthony Shaffer and Rep. Curt Weldon said the Able Danger programme had identified four hijackers a year before the attacks. In September 2006 the Pentagon inspector general reported \"no evidence\" that it had identified Atta or any other hijacker, and said witness accounts of the chart \"varied significantly.\" [16]",
+      "status": "disputed"
+    },
+    {
+      "claim": "Five Israeli men in New Jersey knew in advance",
+      "on_record": "Five Israeli citizens working for a moving company were detained on September 11 after a witness saw men on a white van filming the burning towers and looking, in her words, \"happy.\" [17] They were held and later deported. I found no court ruling or official finding that they were intelligence officers or knew of the attack beforehand. Press reports of FBI suspicions rest on unnamed officials.",
+      "status": "disputed"
+    },
+    {
+      "claim": "Israeli \"art students\" were tracking the hijackers",
+      "on_record": "A leaked 60-page DEA memo from June 2001 describes young Israelis visiting federal offices and agents' homes claiming to sell art, and says the Hollywood, Florida area seemed to be a central point. Several hijackers also lived in Hollywood. [18] An FBI spokesman called the spy-ring story \"bogus,\" and Israel denied it. [19] The memo itself draws no link to the hijackers.",
+      "status": "disputed"
+    },
+    {
+      "claim": "Fighters were held back on purpose",
+      "on_record": "The tapes and logs show the military was told too late to intercept any of the four planes. The inaccurate timeline NORAD first gave is real and fed this suspicion. [10]",
+      "status": "not_supported"
+    }
+  ]
+}

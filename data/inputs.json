@@ -1,0 +1,33 @@
+{
+  "note": "tag: nist = from the NIST investigation, estimate = Claude's estimate (challenge it), standard = code or textbook value. source ids refer to sources.json.",
+  "tower": {
+    "storeys": { "value": 110, "tag": "nist", "sources": [1] },
+    "height_ft": { "wtc1": 1368, "wtc2": 1362, "tag": "nist", "sources": [1, 8] },
+    "width_ft": { "value": 207, "tag": "nist", "sources": [8] },
+    "core_ft": { "value": [135, 87], "tag": "nist", "sources": [1] },
+    "perimeter_columns": { "value": 236, "per_face": 59, "box_in": 14, "spacing_in": 40, "tag": "nist", "sources": [1] },
+    "core_columns": { "value": 47, "tag": "nist", "sources": [1] },
+    "floor_area_sqft": { "value": 40000, "tag": "nist", "sources": [1] },
+    "sway_period_s": { "value": 11.4, "tag": "nist", "sources": [4] },
+    "design_wind_drift_in": { "value": [51.2, 55.7, 56.6, 65.3], "tag": "nist", "sources": [6] },
+    "floor_connection_capacity_lb": { "value": 29000000, "tag": "nist", "sources": [2] },
+    "floor_service_load_lb": { "value": 2500000, "tag": "nist", "sources": [2] },
+    "storey_weight_million_lb": { "value": 5.5, "tag": "estimate" },
+    "mechanical_floors": { "value": [[7, 8], [41, 42], [75, 76], [108, 109]], "tag": "nist", "sources": [1] }
+  },
+  "wtc1": {
+    "flight": "American 11", "impact_floor": 96, "damage_floors": [93, 99], "speed_mph": 443, "speed_pm": 30,
+    "plane_lb": 283600, "fuel_gal": 10000, "floors_above_collapse_zone": 12, "minutes_to_collapse": 102,
+    "occupants": 8900, "severed_perimeter": 35, "severed_core": 6, "truss_insulation_in": 2.5,
+    "max_inward_bow_in": 55, "tag": "nist", "sources": [1, 2, 3, 5],
+    "estimates": { "plate_in": 0.25, "stripped_floors": 5, "fire_reach_min": 88 }
+  },
+  "wtc2": {
+    "flight": "United 175", "impact_floor": 80, "damage_floors": [78, 84], "speed_mph": 542, "speed_pm": 24,
+    "floors_above_collapse_zone": 28, "minutes_to_collapse": 56, "occupants": 8500,
+    "severed_perimeter": 29, "severed_core": 10, "truss_insulation_in": 0.75,
+    "measured_sway_in": { "floor70": 12, "roof": 22 }, "inward_bow_in": [10, 20], "tag": "nist", "sources": [2, 3, 4, 5, 6],
+    "estimates": { "plane_lb": 283600, "fuel_gal": 9000, "plate_in": 0.375, "stripped_floors": 4, "fire_reach_min": 46 }
+  },
+  "day": { "wind_mph_at_roof": [11, 22], "wind_from": "north", "tag": "nist", "sources": [8] }
+}

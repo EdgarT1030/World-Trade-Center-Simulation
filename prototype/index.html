@@ -1,0 +1,1224 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>[hidden]{display:none!important}body{margin:0}</style></head><body>
+<title>Twin Towers Physics Check</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: an engineer's calc sheet. One column of seven numbered checks in causal order; each check = inputs left, result right, math underneath. */
+:root{
+  --paper:#e9edf1; --sheet:#fbfcfd; --ink:#131a22; --ink-2:#465361; --ink-3:#6b7785; --rule:#c9d1d9; --grid:#dfe5ea;
+  --accent:#1c5aa6; --hot:#eb6834; --cool:#2a78d6; --crit:#b3261e; --ok:#2c6e4c; --warn:#8a5a00;
+  --tag-nist:#1c5aa6; --tag-assume:#8a5a00; --tag-std:#5b6673;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#11151a; --sheet:#1b2027; --ink:#eef2f6; --ink-2:#b6c0cb; --ink-3:#8793a0; --rule:#343d48; --grid:#2a323c;
+  --accent:#74aef2; --hot:#d95926; --cool:#3987e5; --crit:#f0766b; --ok:#72c79d; --warn:#e0b25a;
+  --tag-nist:#74aef2; --tag-assume:#e0b25a; --tag-std:#9aa6b3; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#11151a; --sheet:#1b2027; --ink:#eef2f6; --ink-2:#b6c0cb; --ink-3:#8793a0; --rule:#343d48; --grid:#2a323c;
+  --accent:#74aef2; --hot:#d95926; --cool:#3987e5; --crit:#f0766b; --ok:#72c79d; --warn:#e0b25a;
+  --tag-nist:#74aef2; --tag-assume:#e0b25a; --tag-std:#9aa6b3; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px;padding-block:28px 64px;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.08;letter-spacing:.005em}
+h1{font-size:clamp(2.3rem,6vw,3.6rem);font-weight:700;text-transform:uppercase}
+h2{font-size:clamp(1.6rem,3.6vw,2.1rem);font-weight:600}
+h3{font-size:1.2rem;font-weight:600;letter-spacing:.02em}
+p{margin:0;max-width:66ch}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font-family:var(--f-display);font-weight:600;font-size:.95rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.num{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+.small{font-size:.875rem;color:var(--ink-2)}
+.stack{display:flex;flex-direction:column;gap:12px}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:28px;align-items:start}
+.hero-text{display:flex;flex-direction:column;gap:16px;min-width:0}
+.lede{font-size:1.1rem;color:var(--ink-2)}
+.chain{list-style:none;margin:0;padding:0;border-top:2px solid var(--ink);display:flex;flex-direction:column}
+.chain li{display:grid;grid-template-columns:2.2rem minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--rule)}
+.chain .n{font-family:var(--f-display);font-weight:700;font-size:1.25rem;color:var(--ink-3)}
+.chain a{color:var(--ink);text-decoration:none;font-weight:500}
+.chain a:hover{text-decoration:underline}
+.chain .res{display:block;font-size:.875rem;color:var(--ink-2);font-weight:400}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-display);font-weight:600;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 9px;border:1.5px solid currentColor;border-radius:2px;white-space:nowrap}
+.chip.minor{color:var(--ok)} .chip.major{color:var(--crit)} .chip.info{color:var(--ink-2)}
+.tower-fig{background:var(--sheet);border:1px solid var(--rule);padding:10px}
+.tower-fig svg{display:block;width:100%;height:auto}
+figcaption{font-size:.8rem;color:var(--ink-3);margin-top:6px}
+figure{margin:0}
+
+/* scenario bar */
+.bar-top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--ink);color:var(--paper);padding:10px 14px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.bar-top .lbl{font-family:var(--f-display);letter-spacing:.12em;text-transform:uppercase;font-size:.9rem;opacity:.8}
+.seg{display:inline-flex;border:1.5px solid var(--paper)}
+.seg button{font:600 1rem var(--f-display);letter-spacing:.05em;text-transform:uppercase;background:transparent;color:var(--paper);border:0;padding:6px 14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--paper);color:var(--ink)}
+.bar-top .ghost{font:600 1rem var(--f-display);letter-spacing:.05em;text-transform:uppercase;background:transparent;color:var(--paper);border:1.5px solid transparent;text-decoration:underline;padding:6px 4px;cursor:pointer;margin-left:auto}
+.bar-top .facts{font-family:var(--f-data);font-size:.8rem;opacity:.85}
+
+/* legend of tags */
+.tag{font-family:var(--f-data);font-size:.68rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:1px 5px;border:1px solid currentColor;border-radius:2px;white-space:nowrap;vertical-align:middle}
+.tag.nist{color:var(--tag-nist)} .tag.assume{color:var(--tag-assume)} .tag.std{color:var(--tag-std)}
+.key{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:.875rem;color:var(--ink-2)}
+.note-box{border-left:3px solid var(--ink);padding:4px 0 4px 14px}
+
+/* check sheet */
+.check{background:var(--sheet);border:1px solid var(--rule);border-top:3px solid var(--ink);padding:22px;display:flex;flex-direction:column;gap:18px;scroll-margin-top:70px}
+.check-head{display:flex;flex-direction:column;gap:6px}
+.check-body{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:28px}
+.inputs,.result{display:flex;flex-direction:column;gap:14px;min-width:0}
+.ctl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:baseline}
+.ctl label{font-weight:500;font-size:.93rem}
+.ctl output{font-family:var(--f-data);font-size:.93rem;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:4px 0 0}
+.ctl .why{grid-column:1/-1;font-size:.78rem;color:var(--ink-3)}
+.choice{display:flex;flex-wrap:wrap;gap:6px}
+.choice button{font:500 .88rem var(--f-body);background:transparent;color:var(--ink);border:1px solid var(--rule);padding:5px 10px;cursor:pointer;border-radius:2px}
+.choice button[aria-pressed="true"]{background:var(--ink);color:var(--sheet);border-color:var(--ink)}
+.verdict{display:flex;flex-direction:column;gap:8px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.verdict p{font-size:1.05rem;font-weight:500}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px 18px;margin:0}
+.readouts div{display:flex;flex-direction:column;gap:1px}
+.readouts dt{font-size:.78rem;color:var(--ink-3)}
+.readouts dd{margin:0;font-family:var(--f-data);font-weight:600;font-size:1.05rem;font-variant-numeric:tabular-nums}
+details{border-top:1px dashed var(--rule);padding-top:10px}
+summary{cursor:pointer;font-family:var(--f-display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.95rem;color:var(--accent)}
+.math{font-family:var(--f-data);font-size:.82rem;line-height:1.7;background:var(--paper);padding:12px 14px;margin-top:10px;overflow-x:auto;white-space:pre}
+details p{margin-top:10px;font-size:.9rem;color:var(--ink-2)}
+
+/* charts */
+.chart{position:relative;min-width:0}
+.chart svg{display:block;width:100%;overflow:visible}
+.chart-title{font-weight:600;font-size:.9rem;margin-bottom:4px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.8rem;color:var(--ink-2);margin-bottom:4px}
+.legend i{display:inline-block;width:18px;height:0;border-top:2.5px solid var(--ink-3);vertical-align:middle;margin-right:6px}
+.legend i.hot{border-color:var(--hot)} .legend i.cool{border-color:var(--cool)} .legend i.gas{border-top-style:dashed} .legend i.sel{border-color:var(--accent)}
+.legend i.blk{height:10px;border:0;background:var(--accent);width:12px} .legend i.blk.ref{background:var(--ink-3)}
+svg text{font-family:var(--f-data);font-size:11px;fill:var(--ink-2)}
+svg .axis{stroke:var(--ink-3);stroke-width:1;fill:none} svg .gridl{stroke:var(--grid);stroke-width:1;fill:none}
+svg .ln{fill:none;stroke-width:2;stroke-linejoin:round} svg .ln.hot{stroke:var(--hot)} svg .ln.cool{stroke:var(--cool)}
+svg .ln.gas{stroke:var(--ink-3);stroke-dasharray:5 4;stroke-width:1.5} svg .ln.faint{stroke:var(--ink-3);stroke-width:1;opacity:.55} svg .ln.sel{stroke:var(--accent);stroke-width:2.5}
+svg .ref{stroke:var(--ink-2);stroke-width:1;stroke-dasharray:2 3;fill:none} svg .ref.crit{stroke:var(--crit);stroke-dasharray:6 3;stroke-width:1.5}
+svg .reflbl{fill:var(--ink)} svg .cross{stroke:var(--ink-3);stroke-width:1}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);font-family:var(--f-data);font-size:.75rem;padding:6px 8px;line-height:1.45;white-space:nowrap;z-index:3}
+.bars{display:flex;flex-direction:column;gap:9px}
+.bar-row{display:grid;grid-template-columns:minmax(0,1fr);gap:3px}
+.bar-row .bl{font-size:.82rem;color:var(--ink-2)}
+.bar-line{display:flex;align-items:center;gap:8px}
+.bar-track{flex:1;min-width:0;height:14px;border-left:1px solid var(--ink-3)}
+.bar-fill{height:100%;background:var(--accent);border-radius:0 4px 4px 0;min-width:2px}
+.bar-fill.ref{background:var(--ink-3)}
+.bar-val{font-family:var(--f-data);font-size:.82rem;font-weight:600;white-space:nowrap}
+
+/* plan + tables */
+.plan svg{display:block;width:100%;max-width:300px;height:auto}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:.9rem}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--rule)}
+th{font-family:var(--f-display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.9rem;color:var(--ink-2);border-bottom:2px solid var(--ink)}
+td:first-child{font-weight:600}
+.plain{display:flex;flex-direction:column;gap:14px}
+.plain ul,.plain ol{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:8px;max-width:72ch}
+.sources li{font-size:.9rem}
+
+/* views, tabs */
+.top{display:flex;flex-direction:column;gap:12px}
+.tabs{display:flex;flex-wrap:wrap;gap:0;border-bottom:2px solid var(--ink)}
+.tabs button{font:600 1.15rem var(--f-display);letter-spacing:.06em;text-transform:uppercase;background:transparent;color:var(--ink-2);border:0;border-bottom:4px solid transparent;padding:10px 18px 8px;cursor:pointer}
+.tabs button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--accent);background:var(--sheet)}
+.view{display:flex;flex-direction:column;gap:28px}
+/* simulation */
+.sim-grid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);gap:28px}
+.sim-stage{display:flex;flex-direction:column;gap:14px;min-width:0}
+.sim-canvases{display:grid;grid-template-columns:minmax(0,34fr) minmax(0,40fr);gap:12px;align-items:start}
+.sim-canvases canvas{display:block;width:100%;height:auto;background:var(--paper);border:1px solid var(--rule);touch-action:pan-x}
+#cvTower{cursor:ns-resize}
+.sim-bar{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
+.btn{font:600 1.05rem var(--f-display);letter-spacing:.06em;text-transform:uppercase;background:transparent;color:var(--ink);border:1.5px solid var(--ink);padding:7px 16px;cursor:pointer;border-radius:2px}
+.btn.primary{background:var(--ink);color:var(--sheet)}
+.btn:hover{border-color:var(--accent)}
+.sim-clock{margin-left:auto;font-size:1.05rem;font-weight:600}
+.sim-clock .lbl{font-family:var(--f-display);letter-spacing:.12em;text-transform:uppercase;font-size:.9rem;color:var(--ink-3);font-weight:600}
+.sim-result{min-height:3.2em;padding:10px 14px;border-left:4px solid var(--ink-3);background:var(--paper);font-weight:500}
+.sim-result.collapse{border-left-color:var(--crit)} .sim-result.stands{border-left-color:var(--ok)}
+.sim-result b{font-family:var(--f-display);letter-spacing:.06em;text-transform:uppercase;font-size:1.1rem}
+/* record */
+table.rec td:first-child{white-space:nowrap}
+table.rec td:nth-child(2){min-width:300px}
+.plain>p{max-width:72ch}
+.plain li .tag,.plain p .tag{margin-right:4px}
+svg .fl-bar{fill:var(--grid);stroke:var(--ink-3);stroke-width:1} svg .fl-warn{fill:var(--hot)}
+@media (max-width:820px){
+  .sim-grid{grid-template-columns:minmax(0,1fr)} .sim-canvases{grid-template-columns:minmax(0,1fr)} .sim-canvases figure{max-width:400px} .tabs button{padding:9px 11px 7px;font-size:1.05rem} .sim-clock{margin-left:0;width:100%} table.rec td:first-child{white-space:normal}
+  .hero{grid-template-columns:minmax(0,1fr)} .tower-fig{max-width:230px}
+  .check-body{grid-template-columns:minmax(0,1fr)} .check{padding:16px}
+  .chain li{grid-template-columns:1.8rem minmax(0,1fr)} .chain .chip{grid-column:2;justify-self:start}
+  .bar-top .ghost{margin-left:0}
+  .bar-top{position:static}
+}
+@media (prefers-reduced-motion:no-preference){.bar-fill{transition:width .15s}}
+</style>
+<div class="wrap">
+<header class="top">
+  <span class="eyebrow">World Trade Center, September 11, 2001 · Open workbook</span>
+  <h1>Twin Towers Physics Check</h1>
+  <p class="lede">Could a jet impact and the fires that followed bring down a 110-storey steel tower? And what did the government know beforehand? Run the simulation, check the math behind it, and read the dated record of warnings. Every number can be changed or traced to its source.</p>
+</header>
+<nav class="tabs" aria-label="Sections">
+  <button type="button" data-view="sim" aria-pressed="true">Simulation</button>
+  <button type="button" data-view="calc" aria-pressed="false">Calc sheet</button>
+  <button type="button" data-view="record" aria-pressed="false">Warnings record</button>
+</nav>
+<div class="view" id="view-sim">
+<section class="check" id="sim">
+  <div class="check-head"><span class="eyebrow">Interactive simulation</span><h2>Fly the plane, change the building, run the clock</h2>
+  <p class="small">Drag the plane up or down to choose where it hits. Set the plane, the building and the fire, then press Run. The picture is driven by the same formulas as the calc sheet, so the tower can survive if you give it the conditions to.</p></div>
+  <div class="sim-grid">
+    <div class="sim-stage">
+      <div class="sim-bar">
+        <button type="button" class="btn primary" id="simRun">Run</button>
+        <button type="button" class="btn" id="simSkip">Skip to the end</button>
+        <button type="button" class="btn" id="simReset">Reset</button>
+        <span class="sim-clock"><span class="lbl">Clock</span> <span class="num" id="simClock">before impact</span></span>
+      </div>
+      <div class="sim-canvases">
+        <figure><canvas id="cvTower" width="340" height="610" aria-label="Side view of the tower and the aircraft"></canvas><figcaption>Whole tower, to scale. Sway is drawn 40 times larger than real.</figcaption></figure>
+        <figure><canvas id="cvZoom" width="400" height="610" aria-label="Cut through the fire floors showing floor trusses and the outer wall"></canvas><figcaption>Cut through the fire floors: core on the left, outer wall on the right. Steel is coloured by its temperature.</figcaption></figure>
+      </div>
+      <div class="sim-result" id="simResult" aria-live="polite"></div>
+      <dl class="readouts" id="simGauges"></dl>
+    </div>
+    <div class="inputs">
+      <div class="stack"><span class="eyebrow">Start from</span>
+        <div class="choice" id="simPresets">
+          <button type="button" data-p="wtc1" aria-pressed="true">Flight 11 into WTC 1</button>
+          <button type="button" data-p="wtc2" aria-pressed="false">Flight 175 into WTC 2</button>
+        </div>
+        <span class="eyebrow">Or try a what-if</span>
+        <div class="choice" id="simWhatifs">
+          <button type="button" data-w="ins">Insulation stays on</button>
+          <button type="button" data-w="top">Hit near the top</button>
+          <button type="button" data-w="low">Hit at floor 50</button>
+          <button type="button" data-w="two">Insulation lost on 2 floors only</button>
+        </div>
+      </div>
+      <h3>The plane</h3>
+      <div class="inputs" data-sim="impactFloor,speedMph,planeLb,fuelGal"></div>
+      <h3>The building</h3>
+      <div class="inputs" data-sim="stripped,insIn,floorMlb"></div>
+      <h3>The fire</h3>
+      <div class="inputs" data-sim="loadPsf,reachMin"></div>
+    </div>
+  </div>
+  <details><summary>What is computed and what is only drawn</summary>
+  <p><b>Computed.</b> Roof sway from the plane's momentum. Fire temperature at the wall on each of seven floors. Steel temperature of each floor truss and outer column, every 5 seconds. Which floors have sagged (truss above 600 °C). How far the outer columns span without support, and their buckling strength at their current temperature. Whether the floors below can catch the falling block, and how long the fall takes if they cannot.</p>
+  <p><b>Set by you, not predicted.</b> How many floors lost their insulation, and how long the fire takes to reach the wall that fails. NIST says the time to collapse was governed by how long the fires took to reach and weaken that wall. [1] The default is set so the two real cases land near the real collapse times of 102 and 56 minutes. This model cannot predict those times on its own.</p>
+  <p><b>Estimates inside the model.</b> Fire reaches each floor above and below 5 minutes after its neighbour. A spot burns at peak for 5 minutes per lb/sq ft of contents and burns out after about 22 minutes per lb/sq ft, which matches NIST's note that 4 lb/sq ft gives a fire of about an hour and a half. [7] Outer columns are heated on their one inside face and lose heat from the other three, so they run much cooler than the trusses. Column plates are assumed thicker lower in the tower. Extra load on the wall scales with the plane's energy.</p>
+  <p><b>Only drawn.</b> Flames, smoke, the fireball and dust are there for orientation. The amount of inward bowing in the picture is schematic. The fall is shown in real time using the calc sheet's momentum-only fall time.</p>
+  <p><b>A fair objection.</b> NIST examined recovered steel and found only three of more than 170 outer-panel locations had been above 250 °C, and no sample showed long exposure above 600 °C. NIST adds that the pieces it examined were 3% of the outer columns on the fire floors and cannot be taken as representative. [13] The trusses, which this model heats past 600 °C, were mostly not recoverable as identifiable pieces.</p></details>
+</section>
+</div>
+<div class="view" id="view-calc" hidden>
+<div class="hero">
+  <div class="hero-text">
+    <h2>Seven checks, in the order things happened</h2>
+    <p class="small">Each check has its inputs on sliders, a result, and the formula underneath.</p>
+    <ol class="chain" id="chain" aria-label="Summary of the seven checks"></ol>
+  </div>
+  <figure class="tower-fig">
+    <div id="towerSvg"></div>
+    <figcaption id="towerCap">Elevation drawn to scale. Grey bands are the mechanical floors.</figcaption>
+  </figure>
+</div>
+<div class="bar-top" role="group" aria-label="Scenario">
+  <span class="lbl">Tower</span>
+  <span class="seg">
+    <button type="button" id="btn-wtc1" aria-pressed="true">WTC 1 North</button>
+    <button type="button" id="btn-wtc2" aria-pressed="false">WTC 2 South</button>
+  </span>
+  <span class="facts" id="barFacts"></span>
+  <button type="button" class="ghost" id="btn-reset">Reset to documented values</button>
+</div>
+
+<section class="stack">
+  <div class="key">
+    <span><span class="tag nist">NIST</span> Taken from the federal investigation's reports. Numbers in [brackets] point to the source list.</span>
+    <span><span class="tag assume">Estimate</span> My own estimate. Treat with suspicion and move it.</span>
+    <span><span class="tag std">Standard</span> Textbook constant or engineering code formula.</span>
+  </div>
+  <p class="note-box small">This is a hand-calculation model. It is not a finite-element simulation like the one NIST ran, and it cannot reproduce the collapse frame by frame. What it can do is test whether each link in the chain is physically possible, and show how far an input has to move before a link breaks.</p>
+</section>
+
+<section class="check" id="structure">
+  <div class="check-head"><span class="eyebrow">The building and the day</span><h2>What was standing there</h2></div>
+  <div class="check-body">
+    <figure class="plan">
+      <div id="planSvg"></div>
+      <figcaption id="planCap"></figcaption>
+    </figure>
+    <div class="plain">
+      <ul class="small">
+        <li><b>Size.</b> 110 storeys, 1,368 ft (WTC 1) and 1,362 ft (WTC 2), about 207 ft square, roughly 12 ft per storey. About 40,000 sq ft per floor. [1][8]</li>
+        <li><b>Outer wall.</b> 236 steel box columns, 59 per face, each about 14 in square and 40 in apart, tied together at every floor by 52-in-deep steel plates. This wall resisted the wind and carried about half the weight. [1]</li>
+        <li><b>Core.</b> 47 heavier columns in a 135 ft by 87 ft rectangle around the elevators and stairs, carrying the other half. [1]</li>
+        <li><b>Floors.</b> 4 in of lightweight concrete on steel trusses spanning 60 ft or 35 ft from core to outer wall, with no columns in between. The floors also held the outer columns in line. [1]</li>
+        <li><b>Hat truss.</b> Steel bracing from floor 107 to the roof tying core and outer wall together. [1]</li>
+        <li><b>Fire protection.</b> Sprayed insulation on the steel: about ¾ in on the floor trusses in WTC 2's fire floors, about 2½ in on the upgraded WTC 1 fire floors. [2]</li>
+        <li><b>The day.</b> Clear, with wind from the north at roughly 11 to 22 mph at tower height. About 8,900 people in WTC 1 and 8,500 in WTC 2. NIST puts the towers at one-third to one-half full. [1][6][8]</li>
+        <li><b>Timeline.</b> WTC 1 hit 8:46 a.m., fell 10:28 a.m. (102 minutes). WTC 2 hit 9:02 a.m., fell 9:58 a.m. (56 minutes). [2]</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="check" id="check-1">
+  <div class="check-head"><span class="eyebrow">Check 1 of 7</span><h2>Did the plane's weight overload the building?</h2></div>
+  <div class="check-body">
+    <div class="inputs" data-ctl="planeLb,floorMlb,people"></div>
+    <div class="result">
+      <div class="verdict" id="v1"></div>
+      <div class="chart"><div class="chart-title">Weights compared, million lb</div><div class="bars" id="bars1"></div></div>
+      <dl class="readouts" id="r1"></dl>
+    </div>
+  </div>
+  <details><summary>Show the math</summary><div class="math" id="m1"></div>
+  <p>NIST gives the floor loading directly: the connections holding one floor to the columns could carry about 29 million lb, and the floor's everyday load was about 2.5 million lb. [2] The plane's whole weight is small next to that spare capacity.</p></details>
+</section>
+
+<section class="check" id="check-2">
+  <div class="check-head"><span class="eyebrow">Check 2 of 7</span><h2>Did the impact knock the tower over, or shake it apart?</h2></div>
+  <div class="check-body">
+    <div class="inputs" data-ctl="speedMph,impactFloor,period,momentumFrac"></div>
+    <div class="result">
+      <div class="verdict" id="v2"></div>
+      <div class="chart"><div class="chart-title">Sideways movement at the roof, inches</div>
+        <div class="legend"><span><i class="blk"></i>This model</span><span><i class="blk ref"></i>NIST figure</span></div>
+        <div class="bars" id="bars2"></div></div>
+      <dl class="readouts" id="r2"></dl>
+    </div>
+  </div>
+  <details><summary>Show the math</summary><div class="math" id="m2"></div>
+  <p>The tower is treated as one swinging mass with the 11.4-second period NIST measured from video. [4] The plane hands over its momentum in one push, and the tower swings back and forth. This is my model, and it can be checked: NIST measured WTC 2 swaying 12 in (±1) at floor 70 and about 22 in (±5) at the roof after impact. [4] Set the tower to WTC 2 and compare.</p>
+  <p>The swaying died down within minutes. NIST notes that once it stopped, everything that followed happened at near-zero speed, so the collapse an hour or more later was not a dynamic effect of the hit. [2]</p></details>
+</section>
+
+<section class="check" id="check-3">
+  <div class="check-head"><span class="eyebrow">Check 3 of 7</span><h2>Did the wind that morning matter?</h2></div>
+  <div class="check-body">
+    <div class="inputs" data-ctl="windMph"></div>
+    <div class="result">
+      <div class="verdict" id="v3"></div>
+      <dl class="readouts" id="r3"></dl>
+    </div>
+  </div>
+  <details><summary>Show the math</summary><div class="math" id="m3"></div>
+  <p>The same swinging-mass model gives the tower's sideways stiffness. As a cross-check, NIST calculated that the original design wind loads would move the top 51 to 65 in. [6] The readout shows how strong a wind this model needs to match that. NIST left wind out of its collapse analysis after checking airport wind records for the day. [5]</p></details>
+</section>
+
+<section class="check" id="check-4">
+  <div class="check-head"><span class="eyebrow">Check 4 of 7</span><h2>Was there enough fuel to make a serious fire?</h2></div>
+  <div class="check-body">
+    <div class="inputs" data-ctl="fuelGal,fuelInsideFrac,loadPsf,fireFloors,burnFrac,hcContents"></div>
+    <div class="result">
+      <div class="verdict" id="v4"></div>
+      <div class="chart"><div class="chart-title">Heat available inside the tower, gigajoules</div><div class="bars" id="bars4"></div></div>
+      <dl class="readouts" id="r4"></dl>
+    </div>
+  </div>
+  <details><summary>Show the math</summary><div class="math" id="m4"></div>
+  <p>NIST reports that less than 15% of the jet fuel burned in the spray cloud inside the building and a comparable amount in the fireballs outside, so well over half was left to burn inside. [1] It also says the fires were started by the jet fuel and fed mostly by the building's contents, and that hydrocarbon and ordinary building fires both top out near 1,100 °C. [2] An independent check: NIST estimated from the smoke plume that each tower fire released heat at a rate on the order of one gigawatt. [8] Compare that with the average rate above.</p></details>
+</section>
+
+<section class="check" id="check-5">
+  <div class="check-head"><span class="eyebrow">Check 5 of 7</span><h2>Can an office fire get steel hot enough to matter?</h2></div>
+  <div class="check-body">
+    <div class="inputs">
+      <div class="ctl"><label>Which piece of steel</label><output></output>
+        <div class="choice" id="elemChoice" style="grid-column:1/-1">
+          <button type="button" data-av="300" aria-pressed="true">Floor truss (thin)</button>
+          <button type="button" data-av="160" aria-pressed="false">Outer wall column</button>
+          <button type="button" data-av="40" aria-pressed="false">Core column (thick)</button>
+        </div>
+        <span class="why"><span class="tag assume">Estimate</span> Thin steel heats fast, thick steel slowly. Surface-to-volume ratios of about 300, 160 and 40 per metre, from the plate and bar sizes NIST describes.</span>
+      </div>
+      <div data-ctl="peakC,peakMin,lateC,insIn,lambda" class="inputs"></div>
+    </div>
+    <div class="result">
+      <div class="verdict" id="v5"></div>
+      <div class="chart" id="chart5"><div class="chart-title">Temperature at one spot on a fire floor, °C</div>
+        <div class="legend"><span><i class="gas"></i>Fire gas</span><span><i class="hot"></i>Steel, insulation knocked off</span><span><i class="cool"></i>Steel, insulation intact</span></div>
+        <div class="svg-host"></div></div>
+      <dl class="readouts" id="r5"></dl>
+    </div>
+  </div>
+  <details><summary>Show the math</summary><div class="math" id="m5"></div>
+  <p>This is the standard Eurocode 3 hand method for steel in a fire, stepped every 5 seconds. Steel strength at temperature also comes from Eurocode 3: full strength to 400 °C, 47% at 600 °C, 11% at 800 °C, 4% at 1,000 °C. NIST's own summary is that bare steel at 1,000 °C keeps roughly 10% of its strength and that structural steel melts near 1,500 °C. [2] Nothing here melts. It does not need to.</p>
+  <p>NIST's conclusion rests on the insulation: it found the towers would likely have survived the impacts and fires if the insulation had not been knocked off. [1] Set the insulation thickness to see how much difference it makes in this model.</p></details>
+</section>
+
+<section class="check" id="check-6">
+  <div class="check-head"><span class="eyebrow">Check 6 of 7</span><h2>Can hot, sagging floors make the outer columns buckle?</h2></div>
+  <div class="check-body">
+    <div class="inputs" data-ctl="floorsAbove,unbraced,colC,plateIn,fyKsi,redistrib,pullKip"></div>
+    <div class="result">
+      <div class="verdict" id="v6"></div>
+      <div class="chart" id="chart6"><div class="chart-title">What one outer column can carry, kips (1 kip = 1,000 lb)</div>
+        <div class="legend"><span><i class="sel"></i>Your setting</span><span><i></i>Other unbraced heights (number of floors)</span></div>
+        <div class="svg-host"></div></div>
+      <dl class="readouts" id="r6"></dl>
+    </div>
+  </div>
+  <details><summary>Show the math</summary><div class="math" id="m6"></div>
+  <p>Each outer column was a slender 14-in box. It was strong because a floor held it in line every 12 ft. When floors sag or let go, the column has to span two, three or more storeys unbraced, and its buckling strength drops with the square of that length. Heat lowers the steel's stiffness on top of that. The formula is the AISC 360 column curve with Eurocode 3 hot-steel properties.</p>
+  <p>This is where NIST places the start of both collapses: sagging floors pulled the outer wall inward until it buckled. [2] The inward bowing was measured from photographs before each collapse: up to 55 in on the south face of WTC 1 at 10:23 a.m., five minutes before it fell, and 10 in growing to 20 in on the east face of WTC 2. [5] Compare the bow estimate above. A separate engineering study for the leaseholder agreed on impact and fire as the cause but argued that column failures alone, without the floors, explain the collapses. [9]</p></details>
+</section>
+
+<section class="check" id="check-7">
+  <div class="check-head"><span class="eyebrow">Check 7 of 7</span><h2>Once the top starts to fall, can the floors below stop it?</h2></div>
+  <div class="check-body">
+    <div class="inputs" data-ctl="connCapMlb,floorLoadMlb,daf"></div>
+    <div class="result">
+      <div class="verdict" id="v7"></div>
+      <div class="chart"><div class="chart-title">Floors</div><div class="bars" id="bars7"></div></div>
+      <dl class="readouts" id="r7"></dl>
+    </div>
+  </div>
+  <details><summary>Show the math</summary><div class="math" id="m7"></div>
+  <p>The first part is NIST's own back-of-envelope check, with its numbers on the sliders. [2] The fall times are my calculation: the upper block drops one storey at a time, and each floor it lands on joins the falling mass (momentum is conserved, speed drops a little each time). The floors' own strength is ignored, so the real time would be somewhat longer. NIST reports the first outer wall panels reached the ground about 11 seconds (WTC 1) and 9 seconds (WTC 2) after collapse began, and that parts of both cores stood for 15 to 25 seconds. [2]</p>
+  <p>NIST did not build a detailed computer model of the collapse after it started. It stopped at the point of initiation and argued the rest from energy, as above. [2] Critics count that as a gap.</p></details>
+</section>
+
+<section class="check" id="predictions">
+  <div class="check-head"><span class="eyebrow">Two explanations, side by side</span><h2>What each one predicts, and what was recorded</h2>
+  <p class="small">A way to test any theory: ask what it says you should see, then look at the record. Rows where the record is thin or contested are marked.</p></div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>What to look at</th><th>Impact and fire predict</th><th>Charges at the base predict</th><th>What the record shows</th></tr></thead>
+    <tbody>
+      <tr><td>Where the collapse starts</td><td>At the impact floors, moving down.</td><td>At the bottom. The whole tower drops at once.</td><td>Video from several angles shows both collapses starting at the impact and fire floors and running downward. [2]</td></tr>
+      <tr><td>Warning signs</td><td>The outer wall bows inward for minutes beforehand. The top tilts as it goes.</td><td>None needed.</td><td>Inward bowing of 55 in (WTC 1) and 10 to 20 in (WTC 2) measured from photos before collapse. Both tops tilted. [5]</td></tr>
+      <tr><td>Timing</td><td>A delay while fire heats steel. More damage and less insulation means sooner.</td><td>Any time the charges are set off.</td><td>56 and 102 minutes. WTC 2, hit second, had more core damage and steady fires where insulation was stripped, and fell first. [1]</td></tr>
+      <tr><td>Ground vibration</td><td>Signals begin when debris hits the ground.</td><td>A sharp signal before the tower moves.</td><td>NIST reports no seismic signal before either collapse began. Signals start about 10 seconds after and last about 15 seconds. [2]</td></tr>
+      <tr><td>Explosions heard low in the towers</td><td>Possible, from burning fuel travelling down the elevator shafts.</td><td>Expected.</td><td>Survivors and firefighters did report blasts and lobby damage. NIST attributes them to a fireball that travelled down the shafts and caused fatal injuries as low as the concourse level. [1] Contested by some witnesses.</td></tr>
+      <tr><td>Chemical residue</td><td>None.</td><td>Explosive or thermite residue on the steel.</td><td>Not tested. NIST says it did not test the steel for these compounds and gives its reasons. [2] Open.</td></tr>
+      <tr><td>The 1993 bombing</td><td>Not relevant.</td><td>Shows a basement bomb can bring a tower down.</td><td>On February 26, 1993, a truck bomb went off in the garage under WTC 1. The tower was evacuated and stayed standing. [1]</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="check plain" id="limits">
+  <div class="check-head"><span class="eyebrow">Read before trusting any of this</span><h2>What this sheet cannot tell you</h2></div>
+  <ul>
+    <li><b>It is seven hand calculations, not a simulation.</b> Real fires move, real floors pull unevenly, and loads shift between columns in ways one formula cannot follow.</li>
+    <li><b>Several inputs are my estimates.</b> The tower's weight per storey, the column plate thickness at the impact floors, the insulation's conductivity and how long one spot stayed at peak temperature are not taken from a source. They are tagged, and the results move when you move them.</li>
+    <li><b>Flight 175's weight is assumed equal to Flight 11's.</b> Its fuel load is reported between about 8,200 and 10,000 gallons depending on the source. [8]</li>
+    <li><b>The severed-column counts come from NIST's impact simulations</b>, not from inspection. The building interiors could not be examined afterward. NIST says most physical evidence was destroyed or removed before its investigation began. [2]</li>
+    <li><b>The recovered steel does not confirm the temperatures.</b> NIST found only three of more than 170 examined outer-panel locations had exceeded 250 °C, and no sample showed long exposure above 600 °C. NIST says the samples were 3% of the outer columns on the fire floors and are not representative. [13]</li>
+    <li><b>It covers the Twin Towers only.</b> Building 7, which was not hit by a plane, needs its own analysis.</li>
+    <li><b>Physics cannot settle questions of who knew what.</b> Those belong to the evidence library, built on documents and testimony.</li>
+  </ul>
+</section>
+
+</div>
+<div class="view" id="view-record" hidden>
+<section class="check plain" id="record">
+  <div class="check-head"><span class="eyebrow">Warnings record</span><h2>What the government knew, and when</h2></div>
+  <p>Two separate questions get mixed together. Did the government know an attack was coming? And did anyone know planes were heading for the towers that morning in time to stop them? The public record answers them differently.</p>
+  <ul>
+    <li><b>Before the day:</b> the record shows years of warnings that al Qaeda wanted to attack inside the United States, several that mentioned hijackings or aircraft as weapons, and specific leads on future hijackers that were not acted on.</li>
+    <li><b>On the day:</b> air defense controllers had nine minutes' notice of the first plane and none of the other three, according to the 9/11 Commission's reconstruction from tapes and logs. [10]</li>
+    <li><b>What is missing:</b> no document made public so far shows anyone in the government knowing the date, the targets or the method in advance. That is the gap between "they had warnings" and "they knew."</li>
+  </ul>
+  <div class="key">
+    <span><span class="tag nist">Documented</span> In an official record or a declassified document.</span>
+    <span><span class="tag assume">Disputed</span> Real events, contested meaning.</span>
+    <span><span class="tag std">Not supported</span> Investigated and not borne out, as far as the public record shows.</span>
+  </div>
+</section>
+
+<section class="check plain" id="morning">
+  <div class="check-head"><span class="eyebrow">The morning of September 11</span><h2>How much warning the air defenders had</h2>
+  <p class="small">Each bar runs from takeoff to crash. Times are Eastern, from the 9/11 Commission. [10] NIST's clock puts the two tower impacts 10 to 12 seconds earlier.</p></div>
+  <div class="tbl-wrap"><div id="flightChart" class="chart" style="min-width:680px"></div></div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Flight</th><th>Hijacked</th><th>Airline or FAA knew</th><th>Military told</th><th>Crashed</th><th>Notice to air defense</th></tr></thead>
+    <tbody>
+      <tr><td>American 11<br><span class="small">North Tower</span></td><td>About 8:14</td><td>8:19, a flight attendant phoned the airline</td><td>8:37:52</td><td>8:46:40</td><td>9 minutes. Fighters ordered up at 8:46, airborne 8:53.</td></tr>
+      <tr><td>United 175<br><span class="small">South Tower</span></td><td>8:42 to 8:46</td><td>8:52, a flight attendant phoned the airline</td><td>9:03</td><td>9:03:11</td><td>None</td></tr>
+      <tr><td>American 77<br><span class="small">Pentagon</span></td><td>8:51 to 8:54</td><td>9:05</td><td>9:34, reported as lost, not as hijacked</td><td>9:37:46</td><td>None as a hijack</td></tr>
+      <tr><td>United 93<br><span class="small">Shanksville</span></td><td>9:28</td><td>9:34</td><td>10:07</td><td>10:03:11</td><td>None. Told after the crash.</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li><span class="tag nist">Documented</span> The Commission's summary: the air defenders "had nine minutes' notice on the first hijacked plane, no advance notice on the second, no advance notice on the third, and no advance notice on the fourth." [10]</li>
+    <li><span class="tag nist">Documented</span> Authority to shoot down aircraft reached the military only after the last plane had crashed at 10:03. [10]</li>
+    <li><span class="tag assume">Disputed</span> Military officials first gave a different timeline. In May 2003 testimony, NORAD said it was told of United 93 at 9:16 and of American 77 as a hijack at 9:24. The Commission found both statements incorrect. [10] Critics read the wrong timeline as a cover story. The Commission read it as an inaccurate account that overstated the military's readiness.</li>
+  </ul>
+</section>
+
+<section class="check plain" id="before">
+  <div class="check-head"><span class="eyebrow">Before the attack</span><h2>The dated record of warnings</h2>
+  <p class="small">Every entry here comes from the 9/11 Commission's report, which quotes or summarises the underlying documents. [11][12]</p></div>
+  <div class="tbl-wrap"><table class="rec">
+    <thead><tr><th>When</th><th>What was known or said</th><th>What happened next</th></tr></thead>
+    <tbody>
+      <tr><td>December 1994</td><td>An Algerian group hijacks an airliner, "most likely intending to blow it up over Paris, but possibly to crash it into the Eiffel Tower."</td><td>Cited by the Commission as a known precedent.</td></tr>
+      <tr><td>1995</td><td>After the Manila airliner plot is broken up, Abdul Hakim Murad tells Philippine authorities that he and Ramzi Yousef, the 1993 Trade Center bomber, had discussed flying a plane into CIA headquarters.</td><td>Cited by the Commission as known well before 2001.</td></tr>
+      <tr><td>1998</td><td>White House counterterrorism chief Richard Clarke chairs an exercise in which terrorists seize a Learjet and fly it toward a target in Washington. Threat reports that September mention "a possible plot to fly an explosives-laden aircraft into a U.S. city."</td><td>The Commission cites both as proof the idea had been imagined inside government.</td></tr>
+      <tr><td>December 4, 1998</td><td>President Clinton's daily intelligence brief covers Bin Ladin's involvement in planning a hijack operation.</td><td>The Commission cites it as an early, high-level hijacking warning.</td></tr>
+      <tr><td>August 1999</td><td>The FAA's intelligence office lists a "suicide hijacking operation" among Bin Ladin scenarios.</td><td>Analysts "judged such an operation unlikely."</td></tr>
+      <tr><td>Before 2001</td><td>NORAD develops exercises around aircraft used as weapons. One scenario has a hijacked airliner from overseas crashing into the Pentagon.</td><td>That scenario has the airliner coming from overseas, not from a U.S. airport.</td></tr>
+      <tr><td>January to March 2000</td><td>The CIA learns that Khalid al Mihdhar holds a U.S. visa, and then that Nawaf al Hazmi flew to Los Angeles on January 15, 2000. Both later hijack American 77.</td><td>Neither man is put on a watchlist. The FBI is not told.</td></tr>
+      <tr><td>Spring and summer 2001</td><td>Threat reporting peaks. CIA Director George Tenet later says "the system was blinking red." On June 28 Clarke writes that the activity "had reached a crescendo." A June 30 briefing is headed "Bin Ladin Planning High-Profile Attacks."</td><td>Most reports point to targets overseas. They contain "few specifics regarding time, place, method, or target."</td></tr>
+      <tr><td>July 2001</td><td>An FBI agent in Phoenix warns headquarters of the "possibility of a coordinated effort by Usama Bin Ladin" to send students to U.S. flight schools.</td><td>Managers at headquarters do not see the memo before September 11.</td></tr>
+      <tr><td>July 31, 2001</td><td>An FAA circular alerts airlines to "reports of possible near-term terrorist operations" and says some groups "plan and train for hijackings."</td><td>The same circular says there is "no credible evidence of specific plans to attack U.S. civil aviation." Of 27 FAA security briefings that summer, none covers suicide hijackings.</td></tr>
+      <tr><td>August 6, 2001</td><td>President Bush's daily brief is titled "Bin Ladin Determined to Strike in US." It says al Qaeda members have lived in or travelled to the U.S. and notes FBI reports of activity consistent with preparations for hijackings, including surveillance of federal buildings in New York. [14]</td><td>The brief stayed classified until April 10, 2004.</td></tr>
+      <tr><td>August 15 to 17, 2001</td><td>Flight student Zacarias Moussaoui is arrested in Minnesota. Agents believe he is "an Islamic extremist preparing for some future act." One supervisor says he is "trying to keep someone from taking a plane and crashing into the World Trade Center."</td><td>FBI headquarters disagrees with the Minneapolis agents and does not approve their warrant application.</td></tr>
+      <tr><td>August 23, 2001</td><td>Tenet is briefed under the heading "Islamic Extremist Learns to Fly."</td><td>He sees no al Qaeda connection at the time.</td></tr>
+      <tr><td>August 24, 2001</td><td>Mihdhar and Hazmi are finally watchlisted. Both are already in the country.</td><td>The search goes to one FBI agent as a "Routine" lead. He sends a lead to Los Angeles on September 11.</td></tr>
+    </tbody>
+  </table></div>
+  <p><span class="tag nist">Documented</span> The Commission listed ten "operational opportunities" that were missed, most of them involving Mihdhar, Hazmi and Moussaoui, and concluded that "no one working on these late leads … connected the case in his or her in-box to the threat reports." It named four kinds of failure: "in imagination, policy, capabilities, and management." [11][12]</p>
+</section>
+
+<section class="check plain" id="claims">
+  <div class="check-head"><span class="eyebrow">Claims that go further</span><h2>Where the evidence gets thinner</h2></div>
+  <div class="tbl-wrap"><table class="rec">
+    <thead><tr><th>Claim</th><th>What is on record</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Someone bet on airline stocks falling</td><td>Trading in put options on United and American did spike on September 6 and 10. The Commission reports that "a single U.S.-based institutional investor with no conceivable ties to al Qaeda purchased 95 percent of the UAL puts on September 6," and that much of the American trading traced to an options newsletter faxed to subscribers on September 9. Its conclusion: "the apparently suspicious consistently proved innocuous." [15]</td><td><span class="tag std">Not supported</span></td></tr>
+      <tr><td>A military data-mining unit had identified Mohamed Atta in 2000</td><td>Lt. Col. Anthony Shaffer and Rep. Curt Weldon said the Able Danger programme had identified four hijackers a year before the attacks. In September 2006 the Pentagon inspector general reported "no evidence" that it had identified Atta or any other hijacker, and said witness accounts of the chart "varied significantly." [16]</td><td><span class="tag assume">Disputed</span></td></tr>
+      <tr><td>Five Israeli men in New Jersey knew in advance</td><td>Five Israeli citizens working for a moving company were detained on September 11 after a witness saw men on a white van filming the burning towers and looking, in her words, "happy." [17] They were held and later deported. I found no court ruling or official finding that they were intelligence officers or knew of the attack beforehand. Press reports of FBI suspicions rest on unnamed officials.</td><td><span class="tag assume">Disputed</span></td></tr>
+      <tr><td>Israeli "art students" were tracking the hijackers</td><td>A leaked 60-page DEA memo from June 2001 describes young Israelis visiting federal offices and agents' homes claiming to sell art, and says the Hollywood, Florida area seemed to be a central point. Several hijackers also lived in Hollywood. [18] An FBI spokesman called the spy-ring story "bogus," and Israel denied it. [19] The memo itself draws no link to the hijackers.</td><td><span class="tag assume">Disputed</span></td></tr>
+      <tr><td>Fighters were held back on purpose</td><td>The tapes and logs show the military was told too late to intercept any of the four planes. The inaccurate timeline NORAD first gave is real and fed this suspicion. [10]</td><td><span class="tag std">Not supported</span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="note-box small">How to read this page: the strongest documented case is that the government had repeated warnings and specific leads, and failed to connect them. That case rests on the government's own records. The claim that officials knew the date and targets, and let it happen, needs a document or witness the public record does not yet contain. More records may yet be released, and this section should be updated as they appear.</p>
+</section>
+</div>
+<section class="check plain" id="sources">
+  <div class="check-head"><span class="eyebrow">Check the numbers yourself</span><h2>Sources</h2></div>
+  <ol class="sources">
+    <li>NIST NCSTAR 1, <a href="https://nvlpubs.nist.gov/nistpubs/Legacy/NCSTAR/ncstar1.pdf">Final Report on the Collapse of the World Trade Center Towers</a>, September 2005. Building description, aircraft weight and fuel, impact damage, occupancy.</li>
+    <li>NIST, <a href="https://www.nist.gov/world-trade-center-investigation/study-faqs/wtc-towers-investigation">FAQs: WTC Towers Investigation</a>. Collapse cause, fire and steel temperatures, floor connection capacity, collapse times, seismic record, residue testing.</li>
+    <li>NIST technical briefing, F. Sadek, <a href="https://www.nist.gov/system/files/documents/2017/05/09/3Fahim2.pdf">Aircraft Impact Damage Analysis</a>, September 2005. Impact speeds (443 ± 30 and 542 ± 24 mph), severed-column counts.</li>
+    <li>NIST technical briefing, K. Butler, <a href="https://www.nist.gov/el/disasterstudies/wtc/upload/3Butler.pdf">Post-Impact Frequency Analysis</a>, September 2005. Sway of WTC 2 after impact, 11.4-second period.</li>
+    <li>NIST technical briefings, T. McAllister and J. Gross, <a href="https://www.nist.gov/system/files/documents/2017/05/09/6McAllister.pdf">structural response</a>, <a href="https://www.nist.gov/system/files/documents/2017/05/09/6McAllister2.pdf">probable collapse sequence</a> and <a href="https://www.nist.gov/document/project6finalpdf">response to public comments</a>, September 2005. Inward bowing measurements, wind neglected.</li>
+    <li>NIST briefing, S. Sunder, <a href="https://www.nist.gov/document/sundernibs102405pdf">NIST Response to the World Trade Center Disaster</a>, October 2005. Design-wind drift (51 to 65 in at the top), occupancy.</li>
+    <li>NIST briefing, K. McGrattan, <a href="https://www.nist.gov/system/files/documents/2017/05/09/P5SimulationofFiresinWTC1-2.pdf">Simulation of the Fires in WTC 1 and 2</a>. Combustible load of 3 to 5 lb per sq ft, 4 as the realistic case.</li>
+    <li>NIST NISTIR 6879, <a href="https://www.nist.gov/document/wtctotalreptpdf">Initial Model for Fires in the World Trade Center Towers</a>, May 2002. Wind speed and direction, tower dimensions, heat release rate near one gigawatt, early fuel estimates.</li>
+    <li>Engineering News-Record, <a href="https://enr.com/articles/30309-report-ties-trade-center-collapses-to-column-failures-10-25-02">Report Ties Trade Center Collapses to Column Failures</a>, October 2002. The leaseholder's engineering study.</li>
+    <li>9/11 Commission Report, <a href="https://govinfo.library.unt.edu/911/report/911Report_Ch1.htm">chapter 1, "We Have Some Planes"</a>. Flight and air defense timeline.</li>
+    <li>9/11 Commission Report, <a href="https://govinfo.library.unt.edu/911/report/911Report_Ch8.htm">chapter 8, "The System Was Blinking Red"</a>. Summer 2001 threat reporting, the August 6 brief, Phoenix memo, Moussaoui, watchlisting.</li>
+    <li>9/11 Commission Report, <a href="https://govinfo.library.unt.edu/911/report/911Report_Ch11.htm">chapter 11, "Foresight and Hindsight"</a>. Earlier aircraft-as-weapon warnings, missed opportunities, kinds of failure.</li>
+    <li>NIST NCSTAR 1-3, <a href="https://nvlpubs.nist.gov/nistpubs/Legacy/NCSTAR/ncstar1-3.pdf">Mechanical and Metallurgical Analysis of Structural Steel</a>. Temperatures reached by recovered steel.</li>
+    <li>National Security Archive, <a href="https://nsarchive2.gwu.edu/NSAEBB/NSAEBB116/index.htm">The President's Daily Brief of August 6, 2001</a>. Declassification of the brief.</li>
+    <li>Snopes, <a href="https://www.snopes.com/fact-check/put-paid">quoting the 9/11 Commission on airline put options</a>.</li>
+    <li>NBC News, <a href="https://www.nbcnews.com/id/wbna14941373">Pentagon report refutes pre-9/11 intel claim</a>, September 2006. Able Danger.</li>
+    <li>ABC News 20/20, <a href="https://abcnews.com/2020/story?id=123885">Were Israelis Detained on Sept. 11 Spies?</a>, June 2002.</li>
+    <li>Salon, <a href="https://www.salon.com/2002/05/07/students/">The Israeli "art student" mystery</a>, May 2002.</li>
+    <li>StrategyPage, <a href="https://www.strategypage.com/htmw/htintel/articles/20020312.aspx">Intelligence: March 12, 2002</a>. DEA confirmation of the memo and the FBI's denial of a spy ring.</li>
+  </ol>
+  <p class="small">Formulas: Eurocode 3 (EN 1993-1-2) for steel heating and hot-steel strength, AISC 360 for column buckling. Both are published design codes.</p>
+</section>
+</div>
+<script>
+/* ---------- physics (pure functions; SI inside, US units at the edges) ---------- */
+const U = { LB: 0.45359237, MPH: 0.44704, FT: 0.3048, IN: 0.0254, KIP: 4448.2216, G: 9.81,
+  KG_PER_GAL: 66000 * 0.45359237 / 10000 /* NIST: 10,000 gal = 66,000 lb */ };
+const TOWER = { stories: 110, H: 417, B: 63.1, storyIn: 144 };
+const lerpTable = (tbl, x) => {
+  if (x <= tbl[0][0]) return tbl[0][1];
+  for (let i = 1; i < tbl.length; i++) if (x <= tbl[i][0]) {
+    const [x0, y0] = tbl[i - 1], [x1, y1] = tbl[i];
+    return y0 + (y1 - y0) * (x - x0) / (x1 - x0);
+  }
+  return tbl[tbl.length - 1][1];
+};
+/* Eurocode 3 (EN 1993-1-2) reduction factors for carbon steel */
+const KY = [[20,1],[400,1],[500,.78],[600,.47],[700,.23],[800,.11],[900,.06],[1000,.04],[1100,.02],[1200,0]];
+const KE = [[20,1],[100,1],[200,.9],[300,.8],[400,.7],[500,.6],[600,.31],[700,.13],[800,.09],[900,.0675],[1000,.045],[1100,.0225],[1200,0]];
+const ky = T => lerpTable(KY, T), kE = T => lerpTable(KE, T);
+/* Eurocode 3 specific heat of steel, J/kg.K */
+function cSteel(T) {
+  if (T < 600) return 425 + 0.773 * T - 1.69e-3 * T * T + 2.22e-6 * T * T * T;
+  if (T < 735) return Math.min(5000, 666 + 13002 / (738 - T));
+  if (T < 900) return Math.min(5000, 545 + 17820 / (T - 731));
+  return 650;
+}
+/* Check 2 + 3: tower as a one-mode oscillator, mode shape (z/H)^beta */
+function sway(p) {
+  const M = TOWER.stories * p.floorMass, Mstar = M / (2 * p.beta + 1);
+  const mp = p.planeLb * U.LB, v = p.speedMph * U.MPH;
+  const phiI = Math.pow(p.impactFloor / TOWER.stories, p.beta);
+  const J = p.momentumFrac * mp * v, w = 2 * Math.PI / p.period;
+  const roof = J * phiI / Mstar / w;
+  return { M, Mstar, K: w * w * Mstar, J, KE: 0.5 * mp * v * v, roof,
+    f70: roof * Math.pow(70 / TOWER.stories, p.beta) };
+}
+const WIND = { rho: 1.2, Cd: 1.4, alpha: 0.2 };
+function windDrift(p, mph) {
+  const s = sway(p), V = mph * U.MPH;
+  const Fstar = 0.5 * WIND.rho * WIND.Cd * TOWER.B * TOWER.H * V * V / (2 * WIND.alpha + p.beta + 1);
+  return { drift: Fstar / s.K, q: 0.5 * WIND.rho * V * V };
+}
+function windForDrift(p, driftM) {
+  const s = sway(p);
+  return Math.sqrt(driftM * s.K * (2 * WIND.alpha + p.beta + 1) / (0.5 * WIND.rho * WIND.Cd * TOWER.B * TOWER.H)) / U.MPH;
+}
+/* Check 4: energy ledger */
+function fireEnergy(p) {
+  const jetKg = p.fuelGal * U.KG_PER_GAL;
+  const jetAll = jetKg * 43e6, jetInside = jetAll * p.fuelInsideFrac;
+  const areaM2 = 40000 * U.FT * U.FT, loadKgM2 = p.loadPsf * U.LB / (U.FT * U.FT);
+  const contentsKgPerFloor = areaM2 * loadKgM2;
+  const contents = p.fireFloors * contentsKgPerFloor * p.burnFrac * p.hcContents * 1e6;
+  const total = jetInside + contents;
+  return { jetKg, jetAll, jetInside, contents, contentsKgPerFloor, total,
+    jetShare: jetInside / total, hrrGW: total / (p.minutes * 60) / 1e9 };
+}
+/* Check 5: lumped-mass steel heating, Eurocode 3 method */
+function gasTemp(tMin, p) {
+  const ramp = 3, fall = 10;
+  if (tMin < ramp) return 20 + (p.peakC - 20) * tMin / ramp;
+  if (tMin < ramp + p.peakMin) return p.peakC;
+  if (tMin < ramp + p.peakMin + fall) return p.peakC + (p.lateC - p.peakC) * (tMin - ramp - p.peakMin) / fall;
+  return p.lateC;
+}
+function heatSteel(p) {
+  const dt = 5, n = Math.round(p.totalMin * 60 / dt), rho = 7850, out = [];
+  let Tb = 20, Ti = 20; const dIns = p.insIn * U.IN;
+  for (let i = 0; i <= n; i++) {
+    const tMin = i * dt / 60, Tg = gasTemp(tMin, p);
+    if (i % 12 === 0) out.push({ t: tMin, gas: Tg, bare: Tb, ins: Ti });
+    const hnet = 25 * (Tg - Tb) + 0.7 * 5.67e-8 * (Math.pow(Tg + 273, 4) - Math.pow(Tb + 273, 4));
+    Tb += hnet * p.AV / (rho * cSteel(Tb)) * dt;
+    if (dIns > 0) Ti += (p.lambda / dIns) * p.AV * (Tg - Ti) / (rho * cSteel(Ti)) * dt; else Ti = Tb;
+  }
+  const peak = k => out.reduce((m, r) => Math.max(m, r[k]), 0);
+  const first = (k, lim) => { const r = out.find(r => r[k] >= lim); return r ? r.t : null; };
+  return { series: out, peakBare: peak('bare'), peakIns: peak('ins'), t600Bare: first('bare', 600), t600Ins: first('ins', 600) };
+}
+/* Check 6: perimeter box column, AISC 360 column curve with hot properties */
+function columnAt(p, floors, T) {
+  const b = 14, t = p.plateIn, bi = b - 2 * t;
+  const A = b * b - bi * bi, I = (Math.pow(b, 4) - Math.pow(bi, 4)) / 12, r = Math.sqrt(I / A);
+  const L = floors * TOWER.storyIn, E = 29000 * kE(T), Fy = p.fyKsi * ky(T);
+  const Fe = Math.PI * Math.PI * E / Math.pow(L / r, 2);
+  const Fcr = (Fy <= 0 || Fe <= 0) ? 0 : (Fy / Fe <= 2.25 ? Math.pow(0.658, Fy / Fe) * Fy : 0.877 * Fe);
+  return { A, I, r, L, E, Fy, Fe, cap: Fcr * A, Pe: Fe * A };
+}
+function column(p) {
+  const c = columnAt(p, p.unbraced, p.colC);
+  const demand = p.perimShare * p.floorsAbove * p.floorMass * U.G / 236 / U.KIP * (1 + p.redistrib);
+  const q = p.pullKip / TOWER.storyIn;
+  const bow0 = c.E > 0 ? 5 * q * Math.pow(c.L, 4) / (384 * c.E * c.I) : Infinity;
+  const bow = demand < c.Pe ? bow0 / (1 - demand / c.Pe) : Infinity;
+  return { ...c, demand, ratio: demand / c.cap, bow0, bow, cold: columnAt(p, 1, 20).cap };
+}
+/* Check 7: NIST FAQ 18 floor-connection check + momentum-only crush-down time */
+function progression(p) {
+  const nStatic = p.connCapLb / p.floorLoadLb, nDyn = nStatic / p.daf;
+  const h = TOWER.H / TOWER.stories, start = TOWER.stories - p.floorsAbove;
+  let M = p.floorsAbove, v = 0, t = 0;
+  for (let f = start; f > 0; f--) {
+    const v2 = Math.sqrt(v * v + 2 * U.G * h); t += (v2 - v) / U.G;
+    v = v2 * M / (M + 1); M += 1;
+  }
+  return { nStatic, nDyn, arrests: p.floorsAbove <= nDyn, crushT: t,
+    freeT: Math.sqrt(2 * start * h / U.G), needFactor: p.floorsAbove * p.daf / nStatic };
+}
+/* ---------- simulation model: one run precomputed from the calc-sheet formulas ---------- */
+const SIMK = { sagC: 600, stagger: 5, dtS: 5, peakC: 1000, lateC: 500, trussAV: 300, fy: 65 };
+const KE_ACTUAL = { wtc1: 0.5 * 283600 * U.LB * Math.pow(443 * U.MPH, 2), wtc2: 0.5 * 283600 * U.LB * Math.pow(542 * U.MPH, 2) };
+function wallGas(tRel, psf) {            /* gas temperature at the wall, minutes after the fire arrives there */
+  if (tRel < 0) return 20;
+  const peakMin = 5 * psf, burn = 22.5 * psf;
+  let g = gasTemp(tRel, { peakC: SIMK.peakC, peakMin, lateC: SIMK.lateC });
+  if (tRel > burn) g = Math.max(60, g - (g - 60) * (tRel - burn) / 20);
+  return g;
+}
+function simulate(I) {
+  const F = I.impactFloor, floorsAbove = Math.max(1, 110 - (F + 2));
+  const floors = [-3, -2, -1, 0, 1, 2, 3].filter(i => F + i <= 109 && F + i >= 2);
+  const order = [0, 1, -1, 2, -2, 3, -3].filter(i => floors.includes(i)).slice(0, I.stripped);
+  const sw = sway({ floorMass: I.floorMlb * 1e6 * U.LB, beta: 1.3, period: 11.4, momentumFrac: 1, planeLb: I.planeLb, speedMph: I.speedMph, impactFloor: F });
+  const keRatio = sw.KE / KE_ACTUAL[I.tower];
+  const plateIn = Math.min(1.5, Math.max(0.25, 0.25 + (floorsAbove - 12) * 0.0075));
+  const cp = { plateIn, fyKsi: SIMK.fy };
+  const demand = 0.5 * floorsAbove * I.floorMlb * 1e6 / 236 / 1000 * (1 + 0.10 * Math.min(3, keRatio));
+  const tw = plateIn * U.IN, rho = 7850, sig = 5.67e-8, dIns = I.insIn * U.IN;
+  const st = floors.map(i => ({ i, bare: order.includes(i), t0: I.reachMin + Math.abs(i) * SIMK.stagger, truss: 20, col: 20, sagAt: null }));
+  const burnEnd = Math.max(...st.map(s => s.t0)) + 22.5 * I.loadPsf + 25;
+  const tEnd = Math.min(240, Math.max(burnEnd, 30)), frames = [];
+  let outcome = { type: 'stands', t: tEnd }, n = Math.round(tEnd * 60 / SIMK.dtS);
+  for (let k = 0; k <= n; k++) {
+    const t = k * SIMK.dtS / 60;
+    for (const s of st) {
+      const Tg = wallGas(t - s.t0, I.loadPsf);
+      /* floor truss: all sides in the fire */
+      if (s.bare || dIns <= 0) { const h = 25 * (Tg - s.truss) + 0.7 * sig * (Math.pow(Tg + 273, 4) - Math.pow(s.truss + 273, 4)); s.truss += h * SIMK.trussAV / (rho * cSteel(s.truss)) * SIMK.dtS; }
+      else s.truss += (0.12 / dIns) * SIMK.trussAV * (Tg - s.truss) / (rho * cSteel(s.truss)) * SIMK.dtS;
+      /* outer column: one face of four in the fire, three faces losing heat to outside air at 20 C */
+      const gain = (s.bare || dIns <= 0) ? 25 * (Tg - s.col) + 0.7 * sig * (Math.pow(Tg + 273, 4) - Math.pow(s.col + 273, 4)) : (0.12 / dIns) * (Tg - s.col);
+      const loss = 3 * (25 * (s.col - 20) + 0.7 * sig * (Math.pow(s.col + 273, 4) - Math.pow(293, 4)));
+      s.col += (gain - loss) / (4 * tw * rho * cSteel(s.col)) * SIMK.dtS;
+      if (s.sagAt == null && s.truss >= SIMK.sagC) s.sagAt = t;
+    }
+    /* longest run of neighbouring sagged floors */
+    let best = [], run = [];
+    for (const s of st) { if (s.sagAt != null) { run.push(s); if (run.length > best.length) best = run.slice(); } else run = []; }
+    const unbraced = best.length + 1, pool = best.length ? best : st;
+    const Tcol = Math.max(...pool.map(s => s.col)), cap = columnAt(cp, unbraced, Tcol).cap, ratio = demand / cap;
+    if (k % 6 === 0 || ratio >= 1) frames.push({ t, unbraced, Tcol, cap, ratio, fl: st.map(s => ({ i: s.i, truss: s.truss, col: s.col, gas: wallGas(t - s.t0, I.loadPsf), sag: s.sagAt != null ? Math.min(1, (t - s.sagAt) / 4) : 0, bare: s.bare })), run: best.map(s => s.i) });
+    if (ratio >= 1) { const pr = progression({ connCapLb: 29e6, floorLoadLb: 2.5e6, daf: 2, floorsAbove }); outcome = { type: pr.arrests ? 'partial' : 'collapse', t, pr }; break; }
+  }
+  return { frames, outcome, sw, demand, plateIn, floorsAbove, floors, keRatio, coldCap: columnAt(cp, 1, 20).cap,
+    fe: fireEnergy({ fuelGal: I.fuelGal, fuelInsideFrac: 0.6, loadPsf: I.loadPsf, fireFloors: floors.length, burnFrac: 0.7, hcContents: 16, minutes: outcome.t }) };
+}
+/* ---------- page logic ---------- */
+const PRESET = {
+  wtc1: { planeLb: 283600, speedMph: 443, impactFloor: 96, impLo: 93, impHi: 99, floorsAbove: 12, minutes: 102, people: 8900,
+          fuelGal: 10000, fireFloors: 7, insIn: 2.5, plateIn: 0.25, sevExt: 35, sevCore: 6, heightFt: 1368 },
+  wtc2: { planeLb: 283600, speedMph: 542, impactFloor: 81, impLo: 78, impHi: 84, floorsAbove: 29, minutes: 56, people: 8500,
+          fuelGal: 9000, fireFloors: 6, insIn: 0.75, plateIn: 0.375, sevExt: 29, sevCore: 10, heightFt: 1362 }
+};
+const COMMON = { floorMlb: 5.5, period: 11.4, momentumFrac: 1, windMph: 15, fuelInsideFrac: 0.6, loadPsf: 4, burnFrac: 0.7,
+  hcContents: 16, peakC: 1000, peakMin: 20, lateC: 500, AV: 300, lambda: 0.12, redistrib: 0.10, pullKip: 5, fyKsi: 65,
+  unbraced: 3, colC: 600, connCapMlb: 29, floorLoadMlb: 2.5, daf: 2 };
+const BETA = 1.3, PERSON_LB = 180;
+let tower = 'wtc1', S = { ...COMMON, ...PRESET.wtc1 };
+
+const n0 = x => Math.round(x).toLocaleString('en-US');
+const nf = (x, d) => x.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+const pct = (x, d = 0) => nf(x * 100, d) + '%';
+const T = t => t === 'wtc1';
+const CTL = {
+  planeLb: { label: 'Aircraft weight at impact', min: 180000, max: 400000, step: 100, f: v => n0(v) + ' lb',
+    tag: t => T(t) ? 'nist' : 'assume', why: t => T(t) ? 'Flight 11, a Boeing 767-200ER: 283,600 lb at impact. Empty 183,500 lb, maximum 395,000 lb. [1]' : 'Flight 175 was the same aircraft type. Its weight is assumed equal to Flight 11’s 283,600 lb.' },
+  floorMlb: { label: 'Weight of one storey', min: 3, max: 10, step: 0.1, f: v => nf(v, 1) + ' million lb', tag: 'assume',
+    why: 'Floors, columns, core and contents averaged over the height. NIST gives 2.5 million lb for the floor area outside the core alone. [2]' },
+  people: { label: 'People in the tower', min: 0, max: 20000, step: 100, f: v => n0(v), tag: 'nist',
+    why: t => T(t) ? 'About 8,900 that morning, against a typical 20,000. [1]' : 'About 8,500 (±900) that morning. [6]' },
+  speedMph: { label: 'Impact speed', min: 300, max: 650, step: 1, f: v => n0(v) + ' mph', tag: 'nist',
+    why: t => T(t) ? '443 ± 30 mph from video analysis. [3]' : '542 ± 24 mph from video analysis. [3]' },
+  impactFloor: { label: 'Floor hit', min: 20, max: 108, step: 1, f: v => 'floor ' + n0(v), tag: 'nist',
+    why: t => T(t) ? 'Nose struck floor 96. Damage spanned floors 93 to 99. [1]' : 'Damage spanned floors 78 to 84, with most debris near floor 80. [3]' },
+  period: { label: 'Time for one full sway of the tower', min: 8, max: 15, step: 0.1, f: v => nf(v, 1) + ' s', tag: 'nist',
+    why: '11.4 s measured from video of WTC 2 after impact. NIST’s structural model gave 11.2 s. [4]' },
+  momentumFrac: { label: 'Share of the plane’s momentum the tower absorbed', min: 0.3, max: 1, step: 0.05, f: v => pct(v), tag: 'assume',
+    why: '100% is the worst case. Some debris passed through and out the far side.' },
+  windMph: { label: 'Wind speed at roof height', min: 0, max: 160, step: 1, f: v => n0(v) + ' mph', tag: 'nist',
+    why: 'From the north at 5 to 10 m/s (11 to 22 mph) according to aircraft weather reports that morning. [8]' },
+  fuelGal: { label: 'Jet fuel on board at impact', min: 5000, max: 24000, step: 100, f: v => n0(v) + ' gal',
+    tag: t => T(t) ? 'nist' : 'assume', why: t => T(t) ? 'About 10,000 gal (66,000 lb), less than half of the 23,980 gal capacity. [1]' : 'Reported between about 8,200 and 10,000 gal depending on the source. [8] Capacity 23,980 gal.' },
+  fuelInsideFrac: { label: 'Share of jet fuel left to burn inside', min: 0.2, max: 1, step: 0.05, f: v => pct(v), tag: 'nist',
+    why: 'Under 15% burned in the spray cloud and a similar amount in the fireballs outside, so “well over half” remained. [1]' },
+  loadPsf: { label: 'Office contents that can burn', min: 1, max: 8, step: 0.5, f: v => nf(v, 1) + ' lb per sq ft', tag: 'nist',
+    why: 'Desks, paper, carpet, partitions. NIST tested 3, 4 and 5 and found 4 the realistic case. [7]' },
+  fireFloors: { label: 'Floors on fire', min: 1, max: 10, step: 1, f: v => n0(v), tag: 'assume',
+    why: 'Set to the number of floors in the impact zone.' },
+  burnFrac: { label: 'Share of those contents that burned before collapse', min: 0.1, max: 1, step: 0.05, f: v => pct(v), tag: 'assume', why: 'Fires moved across the floors and had not consumed everything.' },
+  hcContents: { label: 'Heat in office contents', min: 10, max: 25, step: 1, f: v => n0(v) + ' MJ per kg', tag: 'assume',
+    why: 'Wood and paper give about 15 to 18, plastics more. Jet fuel is fixed at 43 MJ per kg.' },
+  peakC: { label: 'Peak fire gas temperature', min: 400, max: 1200, step: 10, f: v => n0(v) + ' °C', tag: 'nist',
+    why: 'NIST’s fire simulations reached about 1,000 °C under the ceilings. [2]' },
+  peakMin: { label: 'Time one spot stays at the peak', min: 5, max: 100, step: 1, f: v => n0(v) + ' min', tag: 'assume',
+    why: 'Fires burn through the contents at one spot and move on.' },
+  lateC: { label: 'Gas temperature after the fire moves on', min: 100, max: 1000, step: 10, f: v => n0(v) + ' °C', tag: 'assume', why: 'Hot smoke from fires elsewhere on the floor.' },
+  insIn: { label: 'Insulation thickness, where intact', min: 0, max: 3, step: 0.05, f: v => nf(v, 2) + ' in', tag: 'nist',
+    why: t => T(t) ? 'About 2½ in on the upgraded floor trusses of these floors. [2]' : 'Specified ½ in, averaging about ¾ in as applied. [2]' },
+  lambda: { label: 'How well the insulation conducts heat', min: 0.04, max: 0.3, step: 0.01, f: v => nf(v, 2) + ' W/m·K', tag: 'assume',
+    why: 'Sprayed mineral-fibre insulation. Lower means better protection. It conducts more as it gets hotter.' },
+  floorsAbove: { label: 'Storeys above the failing floors', min: 3, max: 60, step: 1, f: v => n0(v), tag: 'nist',
+    why: t => T(t) ? '12 storeys above the collapse zone. [2]' : '29 storeys above the collapse zone. [2]' },
+  unbraced: { label: 'Floors in a row that no longer hold the wall', min: 1, max: 6, step: 1, f: v => n0(v) + (v === 1 ? ' (normal)' : ''), tag: 'assume',
+    why: '1 is the building as designed, braced every 12 ft. Sagging or detached floors raise this.' },
+  colC: { label: 'Temperature of the column steel', min: 20, max: 1000, step: 10, f: v => n0(v) + ' °C', tag: 'assume',
+    why: 'Take a value from Check 5 for an outer wall column.' },
+  plateIn: { label: 'Column wall thickness', min: 0.25, max: 1.5, step: 0.0625, f: v => nf(v, 3) + ' in', tag: 'assume',
+    why: 'The plates were thinnest near the top and thicker lower down. [1] Exact size at these floors is my estimate.' },
+  fyKsi: { label: 'Steel yield strength', min: 36, max: 100, step: 1, f: v => n0(v) + ' ksi', tag: 'assume',
+    why: 'The outer wall used grades from 36 to 100 ksi. [1] The grade at these floors is my estimate.' },
+  redistrib: { label: 'Extra load shifted onto this wall', min: 0, max: 0.6, step: 0.05, f: v => '+' + pct(v), tag: 'assume',
+    why: 'Damaged and softened columns shed load to their neighbours.' },
+  pullKip: { label: 'Inward pull from each sagging floor, per column', min: 0, max: 20, step: 0.5, f: v => nf(v, 1) + ' kips', tag: 'assume',
+    why: 'A NIST wall model is labelled with a 5-kip pull. [5]' },
+  connCapMlb: { label: 'What one floor’s connections can hold', min: 10, max: 200, step: 1, f: v => n0(v) + ' million lb', tag: 'nist', why: '29 million lb for a typical floor. [2]' },
+  floorLoadMlb: { label: 'Everyday load on one floor', min: 1, max: 6, step: 0.1, f: v => nf(v, 1) + ' million lb', tag: 'nist', why: '80 lb per sq ft over 31,000 sq ft outside the core. [2]' },
+  daf: { label: 'Penalty for a load that lands suddenly', min: 1, max: 4, step: 0.1, f: v => nf(v, 1) + '×', tag: 'std',
+    why: 'A weight dropped onto a support, even from zero height, loads it twice as hard as the same weight set down gently.' }
+};
+const TAGNAME = { nist: 'NIST', assume: 'Estimate', std: 'Standard' };
+const $ = id => document.getElementById(id);
+const val = (x, t) => typeof x === 'function' ? x(t) : x;
+
+function buildControls() {
+  document.querySelectorAll('[data-ctl]').forEach(host => {
+    host.innerHTML = host.dataset.ctl.split(',').map(k => {
+      const c = CTL[k];
+      return `<div class="ctl"><label for="in-${k}">${c.label}</label><output id="out-${k}" for="in-${k}"></output>
+        <input type="range" id="in-${k}" min="${c.min}" max="${c.max}" step="${c.step}">
+        <span class="why" id="why-${k}"></span></div>`;
+    }).join('');
+  });
+  Object.keys(CTL).forEach(k => $('in-' + k).addEventListener('input', e => { S[k] = +e.target.value; render(); }));
+}
+function syncControls() {
+  Object.keys(CTL).forEach(k => {
+    const c = CTL[k], tg = val(c.tag, tower);
+    $('in-' + k).value = S[k];
+    $('why-' + k).innerHTML = `<span class="tag ${tg}">${TAGNAME[tg]}</span> ${val(c.why, tower)}`;
+  });
+  document.querySelectorAll('#elemChoice button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.av === S.AV)));
+  $('btn-wtc1').setAttribute('aria-pressed', String(tower === 'wtc1'));
+  $('btn-wtc2').setAttribute('aria-pressed', String(tower === 'wtc2'));
+}
+function setTower(t) { tower = t; S = { ...COMMON, ...PRESET[t] }; syncControls(); render(); }
+
+/* ---------- small renderers ---------- */
+const chip = (cls, txt) => `<span class="chip ${cls}"><span aria-hidden="true">${cls === 'major' ? '▲' : cls === 'minor' ? '○' : '■'}</span>${txt}</span>`;
+const verdict = (id, cls, tag, text) => { $(id).innerHTML = `<div>${chip(cls, tag)}</div><p>${text}</p>`; };
+const readouts = (id, rows) => { $(id).innerHTML = rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join(''); };
+function bars(id, rows) {
+  const max = Math.max(...rows.map(r => r.v));
+  $(id).innerHTML = rows.map(r => `<div class="bar-row" title="${r.label}: ${r.txt}"><span class="bl">${r.label}</span>
+    <div class="bar-line"><div class="bar-track"><div class="bar-fill${r.ref ? ' ref' : ''}" style="width:${Math.max(0.3, r.v / max * 100)}%"></div></div><span class="bar-val">${r.txt}</span></div></div>`).join('');
+}
+function lineChart(host, cfg) {
+  const box = host.querySelector('.svg-host'), W = Math.max(280, box.clientWidth || 560), H = 280;
+  const m = { l: 46, r: cfg.rpad || 14, t: 14, b: 36 }, pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const X = x => m.l + (x - cfg.x0) / (cfg.x1 - cfg.x0) * pw, Y = y => m.t + ph - y / cfg.y1 * ph;
+  let s = `<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="${cfg.aria}">`;
+  cfg.yTicks.forEach(v => { s += `<line class="gridl" x1="${m.l}" x2="${m.l + pw}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${m.l - 6}" y="${Y(v) + 4}" text-anchor="end">${n0(v)}</text>`; });
+  cfg.xTicks.forEach(v => { s += `<text x="${X(v)}" y="${m.t + ph + 16}" text-anchor="middle">${n0(v)}</text>`; });
+  s += `<line class="axis" x1="${m.l}" x2="${m.l + pw}" y1="${m.t + ph}" y2="${m.t + ph}"/><text x="${m.l + pw}" y="${H - 4}" text-anchor="end">${cfg.xLabel}</text>`;
+  (cfg.hLines || []).forEach(h => { if (h.y <= cfg.y1) s += `<line class="ref ${h.cls || ''}" x1="${m.l}" x2="${m.l + pw}" y1="${Y(h.y)}" y2="${Y(h.y)}"/><text class="reflbl" x="${h.right ? m.l + pw - 4 : m.l + 6}" y="${Y(h.y) + (h.below ? 14 : -5)}" text-anchor="${h.right ? 'end' : 'start'}">${h.label}</text>`; });
+  (cfg.vLines || []).forEach(v => { s += `<line class="ref" x1="${X(v.x)}" x2="${X(v.x)}" y1="${m.t}" y2="${m.t + ph}"/><text class="reflbl" x="${X(v.x) - 5}" y="${m.t + ph - 7}" text-anchor="end">${v.label}</text>`; });
+  cfg.series.forEach(se => { s += `<path class="ln ${se.cls}" d="${se.pts.map((p, i) => (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ' ' + Y(Math.min(p[1], cfg.y1)).toFixed(1)).join('')}"/>`;
+    if (se.tagAt != null) { const p = se.pts[se.tagAt]; s += `<text x="${X(p[0]) + 5}" y="${Y(p[1]) - 4}">${se.tag}</text>`; } });
+  (cfg.dots || []).forEach(d => { s += `<circle cx="${X(d.x)}" cy="${Y(Math.min(d.y, cfg.y1))}" r="5.5" fill="var(--accent)" stroke="var(--sheet)" stroke-width="2"/>`; });
+  s += `<line class="cross" id="${cfg.id}-cross" y1="${m.t}" y2="${m.t + ph}" x1="0" x2="0" visibility="hidden"/></svg>`;
+  box.innerHTML = s;
+  let tip = host.querySelector('.tip'); if (!tip) { tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; host.appendChild(tip); }
+  const svg = box.firstChild, cross = svg.querySelector('.cross');
+  const move = e => {
+    const r = svg.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * W;
+    if (px < m.l || px > m.l + pw) return leave();
+    const xv = cfg.x0 + (px - m.l) / pw * (cfg.x1 - cfg.x0);
+    cross.setAttribute('x1', px); cross.setAttribute('x2', px); cross.setAttribute('visibility', 'visible');
+    tip.innerHTML = cfg.tip(xv); tip.hidden = false;
+    const hr = host.getBoundingClientRect(), left = e.clientX - hr.left + 12;
+    tip.style.left = (left + tip.offsetWidth > hr.width ? Math.max(0, left - tip.offsetWidth - 24) : left) + 'px';
+    tip.style.top = (r.top - hr.top + m.t + 4) + 'px';
+  };
+  const leave = () => { tip.hidden = true; cross.setAttribute('visibility', 'hidden'); };
+  svg.addEventListener('pointermove', move); svg.addEventListener('pointerdown', move); svg.addEventListener('pointerleave', leave);
+}
+
+/* ---------- drawings ---------- */
+function drawTower() {
+  const P = PRESET[tower], ant = tower === 'wtc1', top = 165, g = 565, pf = 400 / 110, x0 = 92, w = 60.5;
+  const y = f => g - f * pf, vbTop = ant ? 40 : 130;
+  let s = `<svg viewBox="0 ${vbTop} 230 ${g + 30 - vbTop}" role="img" aria-label="Side view of the tower showing the impact floors">`;
+  s += `<rect x="${x0}" y="${top}" width="${w}" height="400" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.2"/>`;
+  [[7, 8], [41, 42], [75, 76], [108, 109]].forEach(([a, b]) => { s += `<rect x="${x0}" y="${y(b)}" width="${w}" height="${(b - a + 1) * pf}" fill="var(--ink-3)" opacity=".5"/>`; });
+  for (let f = 10; f < 110; f += 10) s += `<line x1="${x0}" x2="${x0 + w}" y1="${y(f)}" y2="${y(f)}" stroke="var(--rule)" stroke-width=".7" fill="none"/>`;
+  [20, 40, 60, 80, 100].forEach(f => { s += `<text x="${x0 - 8}" y="${y(f) + 4}" text-anchor="end">fl ${f}</text><line x1="${x0 - 5}" x2="${x0}" y1="${y(f)}" y2="${y(f)}" stroke="var(--ink-3)" fill="none"/>`; });
+  s += `<rect x="${x0}" y="${y(P.impHi)}" width="${w}" height="${(P.impHi - P.impLo + 1) * pf}" fill="var(--hot)"/>`;
+  const iy = y((P.impHi + P.impLo) / 2);
+  s += `<text x="${x0 + w + 8}" y="${iy - 2}" fill="var(--ink)" style="fill:var(--ink);font-weight:600">impact</text><text x="${x0 + w + 8}" y="${iy + 11}">fl ${P.impLo}–${P.impHi}</text>`;
+  const by = (top + y(P.impHi)) / 2;
+  s += `<path d="M${x0 + w + 4} ${top} h5 V${y(P.impHi) - 2} h-5" fill="none" stroke="var(--ink-2)"/><text x="${x0 + w + 14}" y="${Math.min(by, iy - 32)}">${P.floorsAbove} floors</text><text x="${x0 + w + 14}" y="${Math.min(by, iy - 32) + 13}">above</text>`;
+  if (ant) s += `<line x1="${x0 + w / 2}" x2="${x0 + w / 2}" y1="${top}" y2="${top - 105}" stroke="var(--ink)" stroke-width="1.5" fill="none"/><text x="${x0 + w / 2 + 6}" y="${top - 90}">360 ft mast</text>`;
+  s += `<text x="${x0 - 8}" y="${top + 4}" text-anchor="end">${n0(P.heightFt)} ft</text>`;
+  s += `<line x1="20" x2="210" y1="${g}" y2="${g}" stroke="var(--ink)" stroke-width="1.5" fill="none"/><text x="${x0 + w / 2}" y="${g + 16}" text-anchor="middle">207 ft wide</text></svg>`;
+  $('towerSvg').innerHTML = s;
+}
+function drawPlan() {
+  const P = PRESET[tower], o = 30, sz = 220, k = sz / 207, north = tower === 'wtc1';
+  const cw = (north ? 135 : 87) * k, ch = (north ? 87 : 135) * k, cx = o + (sz - cw) / 2, cy = o + (sz - ch) / 2;
+  let s = `<svg viewBox="0 0 280 300" role="img" aria-label="Floor plan showing outer wall columns, core columns and columns severed by the impact">`;
+  s += `<rect x="${o}" y="${o}" width="${sz}" height="${sz}" fill="var(--paper)" stroke="var(--rule)"/><rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" fill="none" stroke="var(--ink-3)" stroke-dasharray="3 3"/>`;
+  const start = north ? 12 : 26, hitY = north ? o : o + sz;
+  for (let side = 0; side < 4; side++) for (let i = 0; i < 59; i++) {
+    const t = o + 4 + i * (sz - 8) / 58; let x, y;
+    if (side === 0) { x = t; y = o; } else if (side === 1) { x = t; y = o + sz; } else if (side === 2) { x = o; y = t; } else { x = o + sz; y = t; }
+    const hit = y === hitY && (side < 2) && i >= start && i < start + P.sevExt;
+    s += `<circle cx="${x.toFixed(1)}" cy="${y}" r="${hit ? 1.9 : 1.5}" fill="var(--${hit ? 'hot' : 'ink'})"/>`;
+  }
+  const rows = [8, 8, 8, 7, 8, 8], pts = [];
+  rows.forEach((n, r) => { for (let c = 0; c < n; c++) { const a = (c + 0.5) / n, b = (r + 0.5) / 6;
+    pts.push(north ? { x: cx + a * cw, y: cy + b * ch } : { x: cx + b * cw, y: cy + a * ch }); } });
+  const tgt = north ? { x: o + sz / 2, y: cy } : { x: cx + cw, y: cy + ch };
+  const order = pts.map((p, i) => [Math.hypot(p.x - tgt.x, (p.y - tgt.y) * (north ? 0.55 : 1)), i]).sort((a, b) => a[0] - b[0]).slice(0, P.sevCore).map(a => a[1]);
+  pts.forEach((p, i) => { const hit = order.includes(i); s += `<rect x="${(p.x - 2.6).toFixed(1)}" y="${(p.y - 2.6).toFixed(1)}" width="5.2" height="5.2" fill="var(--${hit ? 'hot' : 'ink'})"/>`; });
+  const ax = north ? o + sz / 2 : o + sz * 0.68;
+  s += north ? `<path d="M${ax} 4 V22 M${ax - 5} 15 L${ax} 23 L${ax + 5} 15" fill="none" stroke="var(--hot)" stroke-width="2"/><text x="${ax + 10}" y="16">Flight 11</text>`
+             : `<path d="M${ax} 296 V278 M${ax - 5} 285 L${ax} 277 L${ax + 5} 285" fill="none" stroke="var(--hot)" stroke-width="2"/><text x="${ax - 10}" y="292" text-anchor="end">Flight 175</text>`;
+  s += `<text x="${o + sz / 2}" y="${north ? 290 : 18}" text-anchor="middle">207 ft · 59 columns per face</text><text x="${o + sz / 2}" y="${cy + ch / 2 + 4}" text-anchor="middle" style="fill:var(--ink-3)"></text></svg>`;
+  $('planSvg').innerHTML = s;
+  $('planCap').innerHTML = `Typical floor plan, to scale, north at the top. The plane came from the ${north ? 'north' : 'south'}. Dots are the 236 outer columns, squares the 47 core columns. Orange marks columns cut by the impact in NIST’s simulation across all damaged floors: ${P.sevExt} outer and ${P.sevCore} core. [${north ? '1' : '3'}] Which individual columns are marked is schematic.`;
+}
+
+/* ---------- main render ---------- */
+function render() {
+  Object.keys(CTL).forEach(k => { $('out-' + k).textContent = CTL[k].f(S[k]); });
+  const floorMass = S.floorMlb * 1e6 * U.LB, name = tower === 'wtc1' ? 'WTC 1' : 'WTC 2';
+  const sp = { floorMass, beta: BETA, period: S.period, momentumFrac: S.momentumFrac, planeLb: S.planeLb, speedMph: S.speedMph, impactFloor: S.impactFloor };
+  const chain = [];
+  $('barFacts').textContent = tower === 'wtc1' ? 'Flight 11 · 8:46 a.m. · fell after 102 min' : 'Flight 175 · 9:02 a.m. · fell after 56 min';
+
+  /* 1 weight */
+  const storeyLb = S.floorMlb * 1e6, aboveLb = storeyLb * S.floorsAbove, peopleLb = S.people * PERSON_LB, spare = (S.connCapMlb - S.floorLoadMlb) * 1e6;
+  const r1 = S.planeLb / storeyLb, c1 = r1 < 0.5 ? 'minor' : 'major';
+  verdict('v1', c1, c1 === 'minor' ? 'Not a cause' : 'Significant', `The aircraft weighed ${pct(r1, 1)} of a single storey and ${pct(S.planeLb / aboveLb, 2)} of the building above the impact. Even resting entirely on one floor it would use ${pct(S.planeLb / spare, 1)} of that floor's spare capacity.`);
+  bars('bars1', [{ label: 'Aircraft', v: S.planeLb / 1e6, txt: nf(S.planeLb / 1e6, 2) }, { label: 'Everyone in the tower', v: peopleLb / 1e6, txt: nf(peopleLb / 1e6, 2) },
+    { label: 'One storey', v: storeyLb / 1e6, txt: nf(storeyLb / 1e6, 1), ref: 1 }, { label: `The ${S.floorsAbove} storeys above the impact`, v: aboveLb / 1e6, txt: nf(aboveLb / 1e6, 0), ref: 1 }]);
+  readouts('r1', [['Aircraft vs one storey', pct(r1, 1)], ['Aircraft vs spare floor capacity', pct(S.planeLb / spare, 1)], ['People, at 180 lb each', nf(peopleLb / 1e6, 2) + ' M lb'], ['Whole tower above ground', n0(storeyLb * 110 / 1e6) + ' M lb']]);
+  $('m1').textContent = `storey weight        = ${nf(S.floorMlb, 1)} million lb            (estimate)
+weight above impact  = ${S.floorsAbove} x ${nf(S.floorMlb, 1)} = ${nf(aboveLb / 1e6, 0)} million lb
+aircraft / storey    = ${n0(S.planeLb)} / ${n0(storeyLb)} = ${pct(r1, 1)}
+spare floor capacity = ${n0(S.connCapMlb)} - ${nf(S.floorLoadMlb, 1)} = ${nf(spare / 1e6, 1)} million lb   (NIST)
+aircraft / spare     = ${pct(S.planeLb / spare, 1)}`;
+  chain.push(['Added weight of the plane', `${pct(r1, 1)} of one storey`, c1, c1 === 'minor' ? 'Not a cause' : 'Significant']);
+
+  /* 2 impact */
+  const sw = sway(sp), roofIn = sw.roof / U.IN, f70 = sw.f70 / U.IN, wd = windDrift(sp, S.windMph), windIn = wd.drift / U.IN;
+  const r2 = roofIn / 51.2, c2 = r2 < 1 ? 'minor' : 'major';
+  verdict('v2', c2, c2 === 'minor' ? 'Not a cause' : 'Exceeds design sway', `The hit pushes the roof about ${nf(roofIn, 0)} in sideways. The towers were designed to sway 51 to 65 in in a design-level storm, so the impact used about ${pct(r2)} of that range.`);
+  bars('bars2', [{ label: 'Plane impact', v: roofIn, txt: nf(roofIn, 1) + ' in' }, { label: 'Plane impact, measured from video of WTC 2 [4]', v: 22, txt: '22 ± 5 in', ref: 1 },
+    { label: `Wind at ${n0(S.windMph)} mph (Check 3)`, v: windIn, txt: nf(windIn, 1) + ' in' }, { label: 'Design wind, lowest of NIST’s four values [6]', v: 51.2, txt: '51–65 in', ref: 1 }]);
+  readouts('r2', [['Energy of the moving plane', nf(sw.KE / 1e9, 2) + ' GJ'], ['Sway at the roof', nf(roofIn, 1) + ' in'], ['Sway at floor 70', nf(f70, 1) + ' in'], ['NIST measured at floor 70 (WTC 2)', '12 ± 1 in']]);
+  $('m2').textContent = `plane mass m        = ${n0(S.planeLb * U.LB)} kg,  speed v = ${nf(S.speedMph * U.MPH, 0)} m/s
+kinetic energy      = 1/2 m v^2 = ${nf(sw.KE / 1e9, 2)} GJ
+momentum J          = ${pct(S.momentumFrac)} x m v = ${nf(sw.J / 1e6, 1)} million kg.m/s
+tower mass M        = 110 x storey = ${n0(sw.M / 1e6)} million kg
+sway shape          = (height / roof height)^1.3   fitted to NIST's 12 in at floor 70, 22 in at roof
+effective mass M*   = M / (2 x 1.3 + 1) = ${nf(sw.Mstar / 1e6, 1)} million kg
+shape at floor ${S.impactFloor}   = (${S.impactFloor}/110)^1.3 = ${nf(Math.pow(S.impactFloor / 110, 1.3), 3)}
+starting roof speed = J x shape / M* = ${nf(sw.J * Math.pow(S.impactFloor / 110, 1.3) / sw.Mstar, 3)} m/s
+roof sway           = speed x period / 2pi = ${nf(sw.roof, 3)} m = ${nf(roofIn, 1)} in`;
+  chain.push(['Force of the impact, tower sway', `${nf(roofIn, 0)} in at the roof vs 51–65 in design`, c2, c2 === 'minor' ? 'Not a cause' : 'Exceeds design']);
+
+  /* 3 wind */
+  const r3 = windIn / 51.2, c3 = r3 < 0.25 ? 'minor' : r3 < 1 ? 'info' : 'major', need = [51.2, 65.3].map(d => windForDrift(sp, d * U.IN));
+  verdict('v3', c3, c3 === 'minor' ? 'Not a cause' : c3 === 'info' ? 'Noticeable' : 'Exceeds design', `A ${n0(S.windMph)} mph wind moves the roof about ${nf(windIn, 1)} in, which is ${pct(r3, 1)} of the design-wind sway. Added to the impact sway the total is ${nf(windIn + roofIn, 0)} in.`);
+  readouts('r3', [['Wind pressure at roof height', nf(wd.q / 47.88, 2) + ' lb/sq ft'], ['Roof movement from wind', nf(windIn, 2) + ' in'], ['Wind this model needs for 51–65 in', `${n0(need[0])}–${n0(need[1])} mph`], ['Wind + impact sway', nf(windIn + roofIn, 1) + ' in']]);
+  $('m3').textContent = `pressure q          = 1/2 x 1.2 kg/m3 x V^2 = ${nf(wd.q, 0)} Pa at the roof
+wind profile        = V x (height / roof height)^0.2,  drag factor 1.4 on a 63 m wide face
+tower stiffness K   = (2pi / period)^2 x M* = ${nf(sw.K / 1e6, 1)} MN/m
+effective push F*   = 1/2 x 1.2 x 1.4 x 63.1 x 417 x V^2 / (2 x 0.2 + 1.3 + 1) = ${nf(wd.drift * sw.K / 1e3, 0)} kN
+roof movement       = F* / K = ${nf(wd.drift, 3)} m = ${nf(windIn, 2)} in`;
+  chain.push(['Wind on the day', `${nf(windIn, 1)} in at the roof`, c3, c3 === 'minor' ? 'Not a cause' : c3 === 'info' ? 'Noticeable' : 'Exceeds design']);
+
+  /* 4 fire energy */
+  const fe = fireEnergy({ fuelGal: S.fuelGal, fuelInsideFrac: S.fuelInsideFrac, loadPsf: S.loadPsf, fireFloors: S.fireFloors, burnFrac: S.burnFrac, hcContents: S.hcContents, minutes: S.minutes });
+  const c4 = fe.hrrGW >= 0.3 ? 'major' : 'minor';
+  verdict('v4', c4, c4 === 'major' ? 'Large fire' : 'Small fire', `The jet fuel supplied about ${pct(fe.jetShare)} of the heat. The rest came from ordinary office contents on ${S.fireFloors} floors. Spread over the ${S.minutes} minutes before collapse, that is an average of ${nf(fe.hrrGW, 2)} gigawatts.`);
+  bars('bars4', [{ label: 'Jet fuel burned in the first fireballs', v: (fe.jetAll - fe.jetInside) / 1e9, txt: n0((fe.jetAll - fe.jetInside) / 1e9), ref: 1 }, { label: 'Jet fuel left inside', v: fe.jetInside / 1e9, txt: n0(fe.jetInside / 1e9) }, { label: `Office contents on ${S.fireFloors} floors`, v: fe.contents / 1e9, txt: n0(fe.contents / 1e9) }]);
+  readouts('r4', [['Jet fuel share of the heat', pct(fe.jetShare)], ['Average heat output', nf(fe.hrrGW, 2) + ' GW'], ['NIST estimate from the smoke plume', 'about 1 GW'], ['Burnable contents per floor', n0(fe.contentsKgPerFloor / U.LB / 2000) + ' tons']]);
+  $('m4').textContent = `jet fuel            = ${n0(S.fuelGal)} gal x 6.6 lb/gal = ${n0(fe.jetKg)} kg
+jet fuel heat       = ${n0(fe.jetKg)} kg x 43 MJ/kg = ${n0(fe.jetAll / 1e9)} GJ, of which ${pct(S.fuelInsideFrac)} inside = ${n0(fe.jetInside / 1e9)} GJ
+contents per floor  = 40,000 sq ft x ${nf(S.loadPsf, 1)} lb/sq ft = ${n0(fe.contentsKgPerFloor)} kg
+contents heat       = ${S.fireFloors} floors x ${n0(fe.contentsKgPerFloor)} kg x ${pct(S.burnFrac)} x ${S.hcContents} MJ/kg = ${n0(fe.contents / 1e9)} GJ
+average output      = ${n0(fe.total / 1e9)} GJ / ${S.minutes} min = ${nf(fe.hrrGW, 2)} GW`;
+  chain.push(['Fuel for the fire', `${nf(fe.hrrGW, 1)} GW average, jet fuel ${pct(fe.jetShare)} of it`, c4, c4 === 'major' ? 'Large fire' : 'Small fire']);
+
+  /* 5 steel heating */
+  const hp = { peakC: S.peakC, peakMin: S.peakMin, lateC: S.lateC, totalMin: S.minutes + 8, AV: S.AV, insIn: S.insIn, lambda: S.lambda };
+  const hs = heatSteel(hp), kb = ky(hs.peakBare), ki = ky(hs.peakIns), c5 = hs.peakBare >= 550 ? 'major' : 'minor';
+  const elem = S.AV === 300 ? 'floor truss' : S.AV === 160 ? 'outer wall column' : 'core column';
+  verdict('v5', c5, c5 === 'major' ? 'Hot enough to weaken' : 'Stays strong', `With its insulation knocked off, a ${elem} reaches about ${n0(hs.peakBare)} °C and keeps ${pct(kb)} of its strength. With ${nf(S.insIn, 2)} in of insulation intact it reaches ${n0(hs.peakIns)} °C and keeps ${pct(ki)}.`);
+  const xMax = hp.totalMin, xt = []; for (let v = 0; v <= xMax; v += 20) xt.push(v);
+  const at = t => hs.series[Math.min(hs.series.length - 1, Math.max(0, Math.round(t)))];
+  lineChart($('chart5'), { id: 'c5', aria: 'Line chart of fire gas temperature and steel temperature over time', x0: 0, x1: xMax, y1: 1600, yTicks: [0, 400, 800, 1200, 1600], xTicks: xt, xLabel: 'minutes after impact',
+    hLines: [{ y: 1500, label: 'steel melts, about 1,500 °C' }, { y: 600, label: '600 °C: half strength', right: 1 }], vLines: [{ x: S.minutes, label: `collapse, ${S.minutes} min` }],
+    series: [{ cls: 'gas', pts: hs.series.map(r => [r.t, r.gas]) }, { cls: 'cool', pts: hs.series.map(r => [r.t, r.ins]) }, { cls: 'hot', pts: hs.series.map(r => [r.t, r.bare]) }],
+    tip: t => { const r = at(t); return `${n0(r.t)} min<br>Fire gas ${n0(r.gas)} °C<br>Bare steel ${n0(r.bare)} °C (${pct(ky(r.bare))} strength)<br>Insulated ${n0(r.ins)} °C (${pct(ky(r.ins))} strength)`; } });
+  readouts('r5', [['Bare steel, peak', n0(hs.peakBare) + ' °C'], ['Strength left, bare', pct(kb)], ['Insulated steel, peak', n0(hs.peakIns) + ' °C'], ['Strength left, insulated', pct(ki)], ['Bare steel passes 600 °C after', hs.t600Bare == null ? 'never' : n0(hs.t600Bare) + ' min'], ['Gap to melting, bare', n0(1500 - hs.peakBare) + ' °C']]);
+  $('m5').textContent = `every 5 seconds, for steel at temperature Ts in gas at Tg:
+bare steel      dTs = [ 25 (Tg - Ts) + 0.7 x 5.67e-8 x (Tg^4 - Ts^4) ] x (A/V) / (7850 x c) x dt
+                      (convection)    (radiation, temperatures in kelvin)
+insulated       dTs = (k / thickness) x (A/V) x (Tg - Ts) / (7850 x c) x dt
+A/V             = ${S.AV} per metre   (${elem})
+k / thickness   = ${nf(S.lambda, 2)} / ${nf(S.insIn * U.IN, 4)} m = ${S.insIn > 0 ? nf(S.lambda / (S.insIn * U.IN), 1) : 'no insulation'} W/m2.K
+c               = specific heat of steel, 440 to 5,000 J/kg.K, Eurocode 3 formula
+gas temperature = rises to ${n0(S.peakC)} C in 3 min, holds ${S.peakMin} min, falls to ${n0(S.lateC)} C over 10 min`;
+  chain.push(['Steel temperature', `bare ${elem}: ${n0(hs.peakBare)} °C, ${pct(kb)} strength left`, c5, c5 === 'major' ? 'Weakens steel' : 'Stays strong']);
+
+  /* 6 column */
+  const cp = { floorMass, perimShare: 0.5, redistrib: S.redistrib, pullKip: S.pullKip, fyKsi: S.fyKsi, plateIn: S.plateIn, floorsAbove: S.floorsAbove, unbraced: S.unbraced, colC: S.colC };
+  const col = column(cp), c6 = col.ratio >= 1 ? 'major' : 'minor';
+  let tCrit = null; for (let t = 20; t <= 1000; t += 10) if (columnAt(cp, S.unbraced, t).cap <= col.demand) { tCrit = t; break; }
+  const bowTxt = isFinite(col.bow) && col.bow < 200 ? nf(col.bow, 1) + ' in' : 'runs away';
+  verdict('v6', c6, c6 === 'major' ? 'Column buckles' : 'Column holds', `Each outer column carries about ${n0(col.demand)} kips. Braced at every floor and cold it can carry ${n0(col.cold)}. Unbraced over ${S.unbraced} floor${S.unbraced > 1 ? 's' : ''} at ${n0(S.colC)} °C it can carry ${n0(col.cap)}, so the load is ${pct(col.ratio)} of capacity.${c6 === 'minor' ? (tCrit ? ` At this unbraced height it buckles once the steel passes about ${n0(tCrit)} \u00b0C.` : ' At this unbraced height it holds at any temperature up to 1,000 \u00b0C.') : ''}`);
+  const Ts = []; for (let t = 20; t <= 1000; t += 20) Ts.push(t);
+  const series = [1, 2, 3, 4, 5, 6].filter(n => n !== S.unbraced).map(n => ({ cls: 'faint', pts: Ts.map(t => [t, columnAt(cp, n, t).cap]), tagAt: 0, tag: String(n) }));
+  series.push({ cls: 'sel', pts: Ts.map(t => [t, columnAt(cp, S.unbraced, t).cap]), tagAt: 0, tag: String(S.unbraced) });
+  const yTop = Math.ceil(col.cold * 1.08 / 100) * 100, yt = []; for (let v = 0; v <= yTop; v += yTop > 1600 ? 400 : 200) yt.push(v);
+  lineChart($('chart6'), { id: 'c6', aria: 'Line chart of column capacity against steel temperature for one to six unbraced floors', x0: 20, x1: 1000, y1: yTop, yTicks: yt, xTicks: [200, 400, 600, 800, 1000], xLabel: 'column steel temperature, °C',
+    hLines: [{ y: col.demand, label: `load on the column, ${n0(col.demand)} kips`, cls: 'crit', right: 1, below: 1 }], series, dots: [{ x: S.colC, y: col.cap }],
+    tip: t => `${n0(t)} °C<br>` + [1, 2, 3, 4, 5, 6].map(n => `${n} floor${n > 1 ? 's' : ''}: ${n0(columnAt(cp, n, t).cap)} kips${n === S.unbraced ? ' ◀' : ''}`).join('<br>') + `<br>Load: ${n0(col.demand)} kips` });
+  readouts('r6', [['Load on one column', n0(col.demand) + ' kips'], ['Capacity as designed, cold', n0(col.cold) + ' kips'], ['Capacity at your settings', n0(col.cap) + ' kips'], ['Load / capacity', pct(col.ratio)], ['Inward bow from the pull', bowTxt], ['NIST measured bow', tower === 'wtc1' ? 'up to 55 in' : '10 to 20 in']]);
+  $('m6').textContent = `load per column  = 50% x ${S.floorsAbove} storeys x ${nf(S.floorMlb, 1)} M lb / 236 columns x (1 + ${pct(S.redistrib)}) = ${n0(col.demand)} kips
+box section      = 14 in square, ${nf(S.plateIn, 3)} in wall:  area ${nf(col.A, 1)} sq in,  I = ${n0(col.I)} in^4,  r = ${nf(col.r, 2)} in
+unbraced length  = ${S.unbraced} x 144 in = ${n0(col.L)} in,  slenderness L/r = ${nf(col.L / col.r, 0)}
+hot steel        = stiffness ${pct(kE(S.colC))} of 29,000 ksi,  yield ${pct(ky(S.colC))} of ${S.fyKsi} ksi   (Eurocode 3)
+Euler stress Fe  = pi^2 E / (L/r)^2 = ${nf(col.Fe, 1)} ksi
+critical stress  = 0.658^(Fy/Fe) x Fy  if Fy/Fe <= 2.25,  else 0.877 Fe     (AISC 360)
+capacity         = critical stress x area = ${n0(col.cap)} kips
+bow              = [5 q L^4 / (384 E I)] / (1 - load / Euler load),  q = ${nf(S.pullKip, 1)} kips per 144 in`;
+  chain.push(['Outer columns under hot, sagging floors', `load is ${pct(col.ratio)} of capacity`, c6, c6 === 'major' ? 'Buckles' : 'Holds']);
+
+  /* 7 progression */
+  const pr = progression({ connCapLb: S.connCapMlb * 1e6, floorLoadLb: S.floorLoadMlb * 1e6, daf: S.daf, floorsAbove: S.floorsAbove }), c7 = pr.arrests ? 'minor' : 'major';
+  verdict('v7', c7, pr.arrests ? 'Collapse stops' : 'Cannot stop', pr.arrests ? `One floor can catch ${nf(pr.nDyn, 1)} floors landing on it, and only ${S.floorsAbove} are falling. In this setting the collapse would be arrested.` : `One floor can catch about ${nf(pr.nDyn, 1)} floors landing on it suddenly. ${S.floorsAbove} came down. The connections would need to be ${nf(pr.needFactor, 1)} times stronger to stop it.`);
+  bars('bars7', [{ label: 'Floors a single floor can catch when they land suddenly', v: pr.nDyn, txt: nf(pr.nDyn, 1) }, { label: 'Floors it can hold if lowered on gently', v: pr.nStatic, txt: nf(pr.nStatic, 1) }, { label: `Floors above the collapse zone, ${name}`, v: S.floorsAbove, txt: n0(S.floorsAbove), ref: 1 }]);
+  readouts('r7', [['Strength needed to stop it', nf(pr.needFactor, 1) + '× actual'], ['Free fall from the impact height', nf(pr.freeT, 1) + ' s'], ['Fall time, floors add mass only', nf(pr.crushT, 1) + ' s'], ['NIST: first wall panels hit ground', tower === 'wtc1' ? 'about 11 s' : 'about 9 s']]);
+  $('m7').textContent = `floors held gently    = ${n0(S.connCapMlb)} / ${nf(S.floorLoadMlb, 1)} = ${nf(pr.nStatic, 1)}
+floors caught falling = ${nf(pr.nStatic, 1)} / ${nf(S.daf, 1)} = ${nf(pr.nDyn, 1)}        vs ${S.floorsAbove} floors above
+fall time             = for each storey: speed up over 12.4 ft of free fall, then
+                        new speed = old speed x mass / (mass + one floor)
+                        ${S.floorsAbove} floors starting at floor ${110 - S.floorsAbove}: ${nf(pr.crushT, 1)} s   (free fall: ${nf(pr.freeT, 1)} s)`;
+  chain.push(['Floors below the falling block', `can catch ${nf(pr.nDyn, 1)} floors, ${S.floorsAbove} fell`, c7, pr.arrests ? 'Stops' : 'Cannot stop']);
+
+  $('chain').innerHTML = chain.map((c, i) => `<li><span class="n">${i + 1}</span><a href="#check-${i + 1}">${c[0]}<span class="res">${c[1]}</span></a>${chip(c[2], c[3])}</li>`).join('');
+}
+
+function start() {
+  buildControls();
+  document.querySelectorAll('#elemChoice button').forEach(b => b.addEventListener('click', () => { S.AV = +b.dataset.av; syncControls(); render(); }));
+  $('btn-wtc1').addEventListener('click', () => { setTower('wtc1'); drawTower(); drawPlan(); });
+  $('btn-wtc2').addEventListener('click', () => { setTower('wtc2'); drawTower(); drawPlan(); });
+  $('btn-reset').addEventListener('click', () => setTower(tower));
+  syncControls(); drawTower(); drawPlan(); render(); simInit(); viewsInit();
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (!$('view-calc').hidden) render(); }, 150); });
+}
+/* ---------- simulation view ---------- */
+const SIM_PRESET = {
+  wtc1: { tower: 'wtc1', impactFloor: 96, speedMph: 443, planeLb: 283600, fuelGal: 10000, stripped: 5, insIn: 2.5, floorMlb: 5.5, loadPsf: 4, reachMin: 88 },
+  wtc2: { tower: 'wtc2', impactFloor: 80, speedMph: 542, planeLb: 283600, fuelGal: 9000, stripped: 4, insIn: 0.75, floorMlb: 5.5, loadPsf: 4, reachMin: 46 } };
+const SIM_CTL = {
+  impactFloor: { label: 'Floor hit', min: 30, max: 106, step: 1, f: v => 'floor ' + n0(v), tag: 'nist', why: t => (T(t) ? 'Flight 11 struck at floor 96. [1]' : 'Flight 175 struck floors 78 to 84, most debris near floor 80. [3]') + ' You can also drag the plane.' },
+  speedMph: { label: 'Speed', min: 250, max: 650, step: 1, f: v => n0(v) + ' mph', tag: 'nist', why: t => (T(t) ? '443 ± 30 mph. [3]' : '542 ± 24 mph. [3]') + ' Changes the sway and the load shifted onto the wall.' },
+  planeLb: { label: 'Weight', min: 180000, max: 400000, step: 1000, f: v => n0(v) + ' lb', tag: t => T(t) ? 'nist' : 'assume', why: t => T(t) ? '283,600 lb at impact. [1]' : 'Assumed equal to Flight 11.' },
+  fuelGal: { label: 'Jet fuel on board', min: 0, max: 24000, step: 500, f: v => n0(v) + ' gal', tag: t => T(t) ? 'nist' : 'assume', why: 'Sets the fireball and the fuel’s share of the heat. In this model the office contents carry the fire, so the outcome barely moves.' },
+  stripped: { label: 'Floors where the impact knocked the insulation off', min: 0, max: 7, step: 1, f: v => n0(v), tag: 'assume', why: 'NIST’s impact simulation stripped insulation from trusses over about 60,000 sq ft in WTC 1. [1] How many neighbouring floors lost it at the failing wall is my estimate.' },
+  insIn: { label: 'Insulation thickness where it stayed on', min: 0, max: 3, step: 0.05, f: v => nf(v, 2) + ' in', tag: 'nist', why: t => T(t) ? 'About 2½ in on these floors. [2]' : 'About ¾ in as applied. [2]' },
+  floorMlb: { label: 'Weight of one storey', min: 3, max: 10, step: 0.1, f: v => nf(v, 1) + ' million lb', tag: 'assume', why: 'Sets the load on the columns and how hard the tower is to push.' },
+  loadPsf: { label: 'Office contents that can burn', min: 1, max: 8, step: 0.5, f: v => nf(v, 1) + ' lb per sq ft', tag: 'nist', why: 'NIST used 4 as the realistic case. [7] More contents means a longer fire.' },
+  reachMin: { label: 'Minutes until fire burns hard at the wall that fails', min: 5, max: 150, step: 1, f: v => n0(v) + ' min', tag: 'assume', why: 'This sets the clock and is not predicted. See the notes under the simulation.' } };
+const REAL = { wtc1: 102, wtc2: 56 }, SG = { G: 590, PF: 417 / 110, cx: 228, half: 31.5, EX: 40 };
+const sim = { I: { ...SIM_PRESET.wtc1 }, R: null, phase: 'ready', real: 0, simMin: 0, parts: [], last: 0, raf: 0, flick: 0, tAt: null };
+const fy = f => SG.G - f * SG.PF;
+let PAL = null;
+function palette() {
+  const g = getComputedStyle(document.documentElement), v = k => g.getPropertyValue(k).trim();
+  const rgb = h => { const m = /^#?([0-9a-f]{6})$/i.exec(h.replace('#', '').length === 6 ? h : '#888888'); const n = parseInt(m ? m[1] : '888888', 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
+  PAL = { paper: v('--paper'), sheet: v('--sheet'), ink: v('--ink'), ink2: v('--ink-2'), ink3: v('--ink-3'), rule: v('--rule'), hot: v('--hot'), crit: v('--crit'), accent: v('--accent'), cold: rgb(v('--ink-3')) };
+}
+function heat(Tc) {
+  const stops = [[20, PAL.cold], [300, [176, 120, 96]], [600, [235, 104, 52]], [1000, [196, 30, 30]]];
+  let a = stops[0], b = stops[stops.length - 1];
+  for (let i = 1; i < stops.length; i++) if (Tc <= stops[i][0]) { a = stops[i - 1]; b = stops[i]; break; } else a = stops[i];
+  const u = b[0] === a[0] ? 0 : Math.max(0, Math.min(1, (Tc - a[0]) / (b[0] - a[0])));
+  return `rgb(${a[1].map((c, i) => Math.round(c + (b[1][i] - c) * u)).join(',')})`;
+}
+function fitCanvas(cv) { const d = Math.min(2, window.devicePixelRatio || 1), w = +cv.dataset.w, h = +cv.dataset.h; cv.width = w * d; cv.height = h * d; const c = cv.getContext('2d'); c.setTransform(d, 0, 0, d, 0, 0); c.font = '11px "IBM Plex Mono", ui-monospace, monospace'; return c; }
+
+function simPrepare() {
+  sim.R = simulate(sim.I);
+  const pr = sim.R.outcome.pr, fi = 110 - sim.R.floorsAbove, h = TOWER.H / 110;
+  sim.tAt = [];
+  if (pr) { let M = sim.R.floorsAbove, v = 0, t = 0; sim.tAt[fi] = 0; for (let f = fi; f > 0; f--) { const v2 = Math.sqrt(v * v + 2 * U.G * h); t += (v2 - v) / U.G; v = v2 * M / (M + 1); M += 1; sim.tAt[f - 1] = t; } }
+  sim.phase = 'ready'; sim.real = 0; sim.simMin = 0; sim.parts = [];
+  $('simRun').textContent = 'Run'; $('simResult').className = 'sim-result'; $('simResult').innerHTML = 'Press Run. Nothing has happened yet.';
+  $('simClock').textContent = 'before impact';
+  Object.keys(SIM_CTL).forEach(k => { const c = SIM_CTL[k], tg = val(c.tag, sim.I.tower); $('sim-in-' + k).value = sim.I[k]; $('sim-out-' + k).textContent = c.f(sim.I[k]); $('sim-why-' + k).innerHTML = `<span class="tag ${tg}">${TAGNAME[tg]}</span> ${val(c.why, sim.I.tower)}`; });
+  document.querySelectorAll('#simPresets button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.p === sim.I.tower)));
+  simDraw();
+}
+function frameNow() { const fr = sim.R.frames; return fr[Math.min(fr.length - 1, Math.max(0, Math.floor(sim.simMin / 0.5)))]; }
+function swayPx() { if (sim.phase !== 'impact') return 0; const ts = sim.real * 6; return sim.R.sw.roof * SG.EX * Math.exp(-0.0138 * ts) * Math.sin(0.551 * ts); }
+function frontFloor() {            /* where the falling block's underside is, during collapse */
+  const fi = 110 - sim.R.floorsAbove; if (sim.R.outcome.type === 'partial') return fi - Math.min(1, sim.real / 0.9);
+  const t = sim.real; for (let f = fi; f > 0; f--) if (t < sim.tAt[f - 1]) return f - (t - sim.tAt[f]) / (sim.tAt[f - 1] - sim.tAt[f]);
+  return 0;
+}
+function drawPlane(c, x, y) {
+  c.save(); c.translate(x, y); c.fillStyle = PAL.ink; c.strokeStyle = PAL.ink;
+  c.beginPath(); c.moveTo(0, 0); c.quadraticCurveTo(-3, -3, -9, -3); c.lineTo(-44, -3); c.lineTo(-48, -1); c.lineTo(-44, 2.5); c.lineTo(-8, 2.5); c.quadraticCurveTo(-2, 2.5, 0, 0); c.fill();
+  c.beginPath(); c.moveTo(-41, -3); c.lineTo(-48, -14); c.lineTo(-45, -14); c.lineTo(-35, -3); c.fill();
+  c.beginPath(); c.moveTo(-18, 1); c.lineTo(-30, 5); c.lineTo(-26, 5); c.lineTo(-13, 1); c.fill();
+  c.restore();
+}
+function drawTowerView() {
+  const cv = $('cvTower'), c = sim.c1, I = sim.I, R = sim.R, ph = sim.phase, x0 = SG.cx - SG.half, x1 = SG.cx + SG.half;
+  c.clearRect(0, 0, 340, 610); c.lineWidth = 1; c.textAlign = 'right';
+  const collapsed = ph === 'collapse' || ph === 'partial' || (ph === 'done' && R.outcome.type !== 'stands');
+  const top = collapsed ? frontFloor() : 110, sp = swayPx(), dx = f => sp * Math.pow(f / 110, 1.3);
+  if (ph === 'done' && R.outcome.type === 'collapse') {
+    c.fillStyle = PAL.ink3; c.beginPath(); c.moveTo(SG.cx - 95, SG.G); c.quadraticCurveTo(SG.cx - 40, SG.G - 22, SG.cx, SG.G - 20); c.quadraticCurveTo(SG.cx + 45, SG.G - 24, SG.cx + 100, SG.G); c.fill();
+  } else {
+    /* standing part */
+    if (top > 0.2) {
+      c.beginPath(); for (let f = 0; f <= top; f += Math.min(5, top)) c.lineTo(x0 + dx(f), fy(f)); c.lineTo(x0 + dx(top), fy(top)); c.lineTo(x1 + dx(top), fy(top));
+      for (let f = top; f >= 0; f -= 5) c.lineTo(x1 + dx(f), fy(f)); c.lineTo(x1, fy(0)); c.closePath(); c.fillStyle = PAL.sheet; c.fill(); c.strokeStyle = PAL.ink; c.stroke();
+      c.strokeStyle = PAL.rule; for (let f = 10; f < top; f += 10) { c.beginPath(); c.moveTo(x0 + dx(f), fy(f)); c.lineTo(x1 + dx(f), fy(f)); c.stroke(); }
+      c.fillStyle = PAL.ink3; c.globalAlpha = .5; [[7, 8], [41, 42], [75, 76], [108, 109]].forEach(([a, b]) => { if (b < top) c.fillRect(x0 + dx(a), fy(b), 63, 2 * SG.PF); }); c.globalAlpha = 1;
+    }
+    /* falling block */
+    if (collapsed) {
+      const fi = 110 - R.floorsAbove, tG = sim.tAt[0] || 0, sh = ph === 'collapse' && sim.real > tG ? Math.max(0, 1 - (sim.real - tG) / 1.5) : 1, bh = R.floorsAbove * SG.PF * sh;
+      c.fillStyle = PAL.sheet; c.strokeStyle = PAL.ink; c.fillRect(x0, fy(top) - bh, 63, bh); c.strokeRect(x0, fy(top) - bh, 63, bh);
+      if (I.tower === 'wtc1' && sh > 0.3) { c.beginPath(); c.moveTo(SG.cx, fy(top) - bh); c.lineTo(SG.cx, fy(top) - bh - 110 * sh); c.stroke(); }
+      c.fillStyle = PAL.ink2; c.fillRect(x0 - 4, fy(top) - 2, 71, 4);
+    } else if (I.tower === 'wtc1') { c.strokeStyle = PAL.ink; c.lineWidth = 1.5; c.beginPath(); c.moveTo(SG.cx + dx(110), fy(110)); c.lineTo(SG.cx + dx(110) * 1.2, fy(110) - 110); c.stroke(); c.lineWidth = 1; }
+    /* fire floors */
+    if (ph !== 'ready' && ph !== 'approach' && !collapsed) {
+      const burnEnd = 22.5 * I.loadPsf + sim.I.reachMin + 15, alive = sim.simMin < burnEnd;
+      R.floors.forEach(i => { const f = I.impactFloor + i; c.fillStyle = alive ? heat(700 + 250 * Math.sin(sim.flick * 3 + i * 1.7)) : PAL.ink2; c.fillRect(x0 + dx(f), fy(f), 63, SG.PF); });
+    }
+  }
+  /* labels */
+  c.fillStyle = PAL.ink2; [20, 40, 60, 80, 100].forEach(f => { if (f < top) c.fillText('fl ' + f, x0 - 8, fy(f) + 4); });
+  c.strokeStyle = PAL.ink; c.lineWidth = 1.5; c.beginPath(); c.moveTo(10, SG.G); c.lineTo(330, SG.G); c.stroke(); c.lineWidth = 1;
+  /* plane */
+  const py = fy(I.impactFloor) - SG.PF / 2;
+  if (ph === 'ready') { c.setLineDash([4, 4]); c.strokeStyle = PAL.ink3; c.beginPath(); c.moveTo(74, py); c.lineTo(x0, py); c.stroke(); c.setLineDash([]); drawPlane(c, 70, py);
+    c.fillStyle = PAL.ink2; c.textAlign = 'left'; c.fillText('↕ drag', 14, py - 20); c.fillText('floor ' + I.impactFloor, 14, py + 22); }
+  if (ph === 'approach') drawPlane(c, 70 + (x0 - 70) * Math.min(1, sim.real / 1.6), py);
+  /* fireball */
+  if (ph === 'impact' && sim.real < 3) { const u = sim.real / 3, r = (12 + 34 * Math.sqrt(I.fuelGal / 10000)) * (0.3 + 0.7 * Math.sqrt(u)), gx = x1 + 6 + 10 * u, g = c.createRadialGradient(gx, py - 6 * u, 1, gx, py - 6 * u, Math.max(2, r));
+    g.addColorStop(0, `rgba(255,214,120,${1 - u})`); g.addColorStop(.5, `rgba(235,104,52,${0.9 * (1 - u)})`); g.addColorStop(1, 'rgba(60,60,60,0)'); c.fillStyle = g; c.beginPath(); c.arc(gx, py - 6 * u, Math.max(2, r), 0, 7); c.fill(); }
+  /* smoke and dust */
+  c.fillStyle = PAL.ink3; sim.parts.forEach(p => { c.globalAlpha = Math.max(0, p.a); c.beginPath(); c.arc(p.x, p.y, p.r, 0, 7); c.fill(); }); c.globalAlpha = 1;
+}
+function drawZoomView() {
+  const c = sim.c2, I = sim.I, R = sim.R, ph = sim.phase, pre = ph === 'ready' || ph === 'approach', fr = frameNow();
+  c.clearRect(0, 0, 400, 610); c.textAlign = 'left';
+  const rows = []; for (let i = 4; i >= -4; i--) rows.push(i);
+  const coreX = 56, wallX = 318, yk = k => 92 + k * 53, data = {}; fr.fl.forEach(f => data[f.i] = f);
+  const run = pre ? [] : fr.run, ratio = pre ? 0 : fr.ratio, nrun = run.length, bow = nrun ? Math.pow(Math.min(1.15, ratio), 2) * (8 + 6 * nrun) : 0;
+  const runTop = nrun ? Math.max(...run) : null, wx = i => { if (!nrun || !run.includes(i)) return wallX; const j = runTop - i + 1; return wallX - bow * Math.sin(Math.PI * j / (nrun + 1)); };
+  /* header */
+  c.fillStyle = PAL.ink; const arrive = I.reachMin;
+  const head = pre ? ['Before impact. Insulation intact on every floor.'] : sim.simMin < arrive ? ['Fire is burning elsewhere on these floors.', `It reaches this wall at about minute ${n0(arrive)}.`] : ['Fire is at this wall.', nrun ? `${nrun} floor${nrun > 1 ? 's' : ''} sagging in a row. Wall spans ${nrun + 1} storeys unbraced.` : 'No floor has sagged yet.'];
+  head.forEach((t, i) => c.fillText(t, 12, 16 + i * 14));
+  /* core */
+  c.strokeStyle = PAL.ink2; c.lineWidth = 9; c.beginPath(); c.moveTo(coreX, 70); c.lineTo(coreX, yk(8) + 26); c.stroke();
+  /* floors */
+  rows.forEach((i, k) => {
+    const d = data[i], y = yk(k), ex = wx(i), fl = I.impactFloor + i;
+    if (fl > 110 || fl < 1) return;
+    const bare = d && d.bare && !pre, Tt = d && !pre ? d.truss : 20, sag = d && !pre ? d.sag : 0, drop = sag * 24;
+    if (d && !pre && d.gas > 200) { c.fillStyle = `rgba(235,104,52,${0.25 + 0.4 * d.gas / 1000})`; for (let q = 0; q < 9; q++) { const fx = 182 + q * 16, fh = (d.gas / 1000) * (16 + 7 * Math.sin(sim.flick * 9 + q * 2.1 + i)); c.beginPath(); c.moveTo(fx - 9, y - 3); c.quadraticCurveTo(fx - 2, y - fh, fx, y - fh - 5); c.quadraticCurveTo(fx + 3, y - fh, fx + 9, y - 3); c.fill(); } }
+    const path = () => { c.beginPath(); c.moveTo(coreX, y); c.quadraticCurveTo((coreX + ex) / 2, y + 2 * drop, ex, y); };
+    if (!bare && I.insIn > 0) { c.strokeStyle = PAL.ink3; c.globalAlpha = .32; c.lineWidth = 4 + I.insIn * 3; path(); c.stroke(); c.globalAlpha = 1; }
+    c.strokeStyle = heat(Tt); c.lineWidth = 3; path(); c.stroke();
+    c.fillStyle = PAL.ink2; c.textAlign = 'right'; c.fillText('fl ' + fl, coreX - 10, y + 4); c.textAlign = 'left';
+    if (d && !pre) { c.fillStyle = PAL.ink; c.fillText(n0(Tt) + ' °C' + (sag > 0 ? ' · sagging' : bare ? ' · bare' : ''), coreX + 12, y - 8); }
+    else if (d) { c.fillStyle = PAL.ink3; c.fillText('20 °C', coreX + 12, y - 8); }
+  });
+  /* wall */
+  c.lineWidth = 5; const broken = ph === 'collapse' || ph === 'partial' || (ph === 'done' && R.outcome.type !== 'stands');
+  for (let k = -1; k < rows.length; k++) {
+    const a = k < 0 ? { x: wallX, y: 70 } : { x: wx(rows[k]), y: yk(k) }, b = k + 1 < rows.length ? { x: wx(rows[k + 1]), y: yk(k + 1) } : { x: wallX, y: yk(8) + 26 };
+    const d = data[rows[Math.max(0, k)]]; c.strokeStyle = heat(d && !pre ? d.col : 20); c.beginPath(); c.moveTo(a.x, a.y); c.lineTo(b.x, b.y); c.stroke();
+  }
+  rows.forEach((i, k) => { const d = data[i]; if (d && !pre) { c.fillStyle = PAL.ink2; c.fillText(n0(d.col) + ' °C', wallX + 12, yk(k) + 4); } });
+  c.fillStyle = PAL.ink2; c.textAlign = 'center'; c.fillText('core', coreX, 64); c.fillText('outer wall', wallX, 64); c.textAlign = 'left';
+  if (broken) { c.fillStyle = PAL.crit; c.font = '600 13px "IBM Plex Mono", monospace'; c.fillText('WALL BUCKLED', 12, 46); c.font = '11px "IBM Plex Mono", monospace'; }
+  /* legend */
+  const g = c.createLinearGradient(56, 0, 236, 0); [20, 300, 600, 1000].forEach(t => g.addColorStop((t - 20) / 980, heat(t))); c.fillStyle = g; c.fillRect(56, 578, 180, 8);
+  c.fillStyle = PAL.ink2; c.fillText('20', 52, 600); c.textAlign = 'center'; c.fillText('600', 56 + 180 * 580 / 980, 600); c.fillText('1,000 °C', 236, 600); c.textAlign = 'left';
+  c.strokeStyle = PAL.ink3; c.globalAlpha = .32; c.lineWidth = 9; c.beginPath(); c.moveTo(280, 582); c.lineTo(300, 582); c.stroke(); c.globalAlpha = 1; c.fillText('insulation', 306, 586);
+}
+function simGauges() {
+  const R = sim.R, pre = sim.phase === 'ready' || sim.phase === 'approach', fr = frameNow();
+  const hotT = pre ? 20 : Math.max(...fr.fl.map(f => f.truss)), colT = pre ? 20 : fr.Tcol;
+  readouts('simGauges', [['Roof sway from the impact', nf(R.sw.roof / U.IN, 1) + ' in'], ['Hottest floor truss', n0(hotT) + ' °C'], ['Outer wall column', n0(colT) + ' °C'],
+    ['Floors sagging in a row', pre ? '0' : String(fr.run.length)], ['Wall load vs buckling strength', pre ? pct(R.demand / R.coldCap) : pct(Math.min(fr.ratio, 9.99))], ['Jet fuel share of the heat', pct(R.fe.jetShare)]]);
+  const m = sim.simMin; $('simClock').textContent = pre ? 'before impact' : sim.phase === 'impact' ? `${n0(sim.real * 6)} s after impact` : `${n0(m)} min after impact`;
+}
+function simDraw() { if (!sim.c1) return; palette(); drawTowerView(); drawZoomView(); simGauges(); }
+function simFinish() {
+  const R = sim.R, o = R.outcome, last = R.frames[R.frames.length - 1], real = REAL[sim.I.tower], name = sim.I.tower === 'wtc1' ? 'WTC 1' : 'WTC 2', el = $('simResult');
+  sim.phase = 'done'; sim.simMin = o.t; sim.real = 1e6; sim.parts = []; $('simRun').textContent = 'Run again';
+  if (o.type === 'collapse') { el.className = 'sim-result collapse'; el.innerHTML = `<b>Collapse at ${n0(o.t)} minutes.</b> ${last.run.length} floors had sagged in a row, leaving the wall columns unbraced over ${last.unbraced} storeys at ${n0(last.Tcol)} °C. They buckled. The ${R.floorsAbove} storeys above came down, and each floor below can catch only about ${nf(o.pr.nDyn, 1)}. The fall takes about ${nf(o.pr.crushT, 0)} seconds in this model. The real ${name} fell after ${real} minutes.`; }
+  else if (o.type === 'partial') { el.className = 'sim-result collapse'; el.innerHTML = `<b>Partial collapse at ${n0(o.t)} minutes.</b> The wall buckled, but only ${R.floorsAbove} storeys were above it. By NIST's simple check the floor below can catch about ${nf(o.pr.nDyn, 1)}, so the fall stops there in this model.`; }
+  else { const mx = Math.max(...R.frames.map(f => f.ratio)), mr = Math.max(...R.frames.map(f => f.run.length)); el.className = 'sim-result stands'; el.innerHTML = `<b>The tower stands.</b> The fire burned out after about ${n0(o.t)} minutes. At most ${mr} floor${mr === 1 ? '' : 's'} sagged in a row, and the wall columns reached ${pct(mx)} of their buckling load. The real ${name} fell after ${real} minutes.`; }
+  simDraw();
+}
+function simTick(now) {
+  const dt = Math.min(0.05, (now - sim.last) / 1000 || 0); sim.last = now; sim.real += dt; sim.flick += dt;
+  const R = sim.R, o = R.outcome, x1 = SG.cx + SG.half;
+  if (sim.phase === 'approach' && sim.real >= 1.6) { sim.phase = 'impact'; sim.real = 0; }
+  else if (sim.phase === 'impact' && sim.real >= 5) { sim.phase = 'fire'; sim.simMin = 0.5; }
+  else if (sim.phase === 'fire') { sim.simMin += dt * Math.max(4, o.t / 14); if (sim.simMin >= o.t) { sim.simMin = o.t; if (o.type === 'stands') return simFinish(); sim.phase = o.type === 'partial' ? 'partial' : 'collapse'; sim.real = 0; } }
+  else if (sim.phase === 'collapse' && sim.real >= sim.tAt[0] + 2.6) return simFinish();
+  else if (sim.phase === 'partial' && sim.real >= 1.6) return simFinish();
+  /* particles */
+  if ((sim.phase === 'impact' || sim.phase === 'fire') && sim.parts.length < 90 && Math.random() < 0.6) sim.parts.push({ x: x1 + 2, y: fy(sim.I.impactFloor + (Math.random() * 6 - 3)), vx: 14 + Math.random() * 16, vy: -(10 + Math.random() * 12), r: 2 + Math.random() * 3, a: .5, g: .14 });
+  if (sim.phase === 'collapse' && sim.parts.length < 220) for (let q = 0; q < 4; q++) { const s = Math.random() < .5 ? -1 : 1; sim.parts.push({ x: SG.cx + s * SG.half, y: fy(frontFloor()), vx: s * (20 + Math.random() * 60), vy: 10 + Math.random() * 50, r: 3 + Math.random() * 5, a: .45, g: .25 }); }
+  sim.parts.forEach(p => { p.x += p.vx * dt; p.y = Math.min(SG.G - 2, p.y + p.vy * dt); p.r += 3 * dt; p.a -= p.g * dt; }); sim.parts = sim.parts.filter(p => p.a > 0 && p.x < 345 && p.x > -5);
+  simDraw(); sim.raf = requestAnimationFrame(simTick);
+}
+function simRun() { cancelAnimationFrame(sim.raf); if (sim.phase !== 'ready') simPrepare(); sim.phase = 'approach'; sim.real = 0; sim.last = performance.now(); $('simRun').textContent = 'Restart'; $('simResult').className = 'sim-result'; $('simResult').textContent = 'Running…'; sim.raf = requestAnimationFrame(simTick); }
+function simSet(patch) { cancelAnimationFrame(sim.raf); Object.assign(sim.I, patch); simPrepare(); }
+function simInit() {
+  document.querySelectorAll('[data-sim]').forEach(host => { host.innerHTML = host.dataset.sim.split(',').map(k => { const c = SIM_CTL[k];
+    return `<div class="ctl"><label for="sim-in-${k}">${c.label}</label><output id="sim-out-${k}" for="sim-in-${k}"></output><input type="range" id="sim-in-${k}" min="${c.min}" max="${c.max}" step="${c.step}"><span class="why" id="sim-why-${k}"></span></div>`; }).join(''); });
+  Object.keys(SIM_CTL).forEach(k => $('sim-in-' + k).addEventListener('input', e => simSet({ [k]: +e.target.value })));
+  document.querySelectorAll('#simPresets button').forEach(b => b.addEventListener('click', () => simSet({ ...SIM_PRESET[b.dataset.p] })));
+  const W = { ins: { stripped: 0 }, top: { impactFloor: 105 }, low: { impactFloor: 50 }, two: { stripped: 2 } };
+  document.querySelectorAll('#simWhatifs button').forEach(b => b.addEventListener('click', () => { simSet({ ...SIM_PRESET[sim.I.tower], ...W[b.dataset.w] }); simRun(); }));
+  $('simRun').addEventListener('click', simRun); $('simReset').addEventListener('click', () => simSet({ ...SIM_PRESET[sim.I.tower] }));
+  $('simSkip').addEventListener('click', () => { cancelAnimationFrame(sim.raf); if (sim.phase === 'done') return; simFinish(); });
+  const c1 = $('cvTower'), c2 = $('cvZoom'); c1.dataset.w = 340; c1.dataset.h = 610; c2.dataset.w = 400; c2.dataset.h = 610; sim.c1 = fitCanvas(c1); sim.c2 = fitCanvas(c2);
+  let drag = false; const pick = e => { const r = c1.getBoundingClientRect(), ly = (e.clientY - r.top) / r.height * 610; simSet({ impactFloor: Math.round(Math.max(30, Math.min(106, (SG.G - ly) / SG.PF))) }); };
+  c1.addEventListener('pointerdown', e => { if (sim.phase !== 'ready' && sim.phase !== 'done') return; drag = true; c1.setPointerCapture(e.pointerId); pick(e); });
+  c1.addEventListener('pointermove', e => { if (drag) pick(e); }); c1.addEventListener('pointerup', () => { drag = false; }); c1.addEventListener('pointercancel', () => { drag = false; });
+  simPrepare();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (sim.phase === 'ready' || sim.phase === 'done') simDraw(); });
+}
+/* ---------- warnings record: flight timeline ---------- */
+function drawFlights() {
+  const host = $('flightChart'), W = Math.max(680, host.clientWidth || 680), rowH = 54, H = 4 * rowH + 44, L = 124, Rr = 150, t0 = 7 * 60 + 55, t1 = 10 * 60 + 12;
+  const X = m => L + (m - t0) / (t1 - t0) * (W - L - Rr), hm = (h, m) => h * 60 + m;
+  const D = [['American 11', 'North Tower', hm(7, 59), hm(8, 14), hm(8, 19), hm(8, 37.87), hm(8, 46.67), '9 min notice'], ['United 175', 'South Tower', hm(8, 14), hm(8, 42), hm(8, 52), hm(9, 3), hm(9, 3.18), 'no notice'],
+    ['American 77', 'Pentagon', hm(8, 20), hm(8, 51), hm(9, 5), hm(9, 34), hm(9, 37.77), 'no notice as a hijack'], ['United 93', 'Shanksville', hm(8, 42), hm(9, 28), hm(9, 34), hm(10, 7), hm(10, 3.18), 'told after the crash']];
+  let s = `<div class="legend"><span><svg width="14" height="12"><rect x="2" y="2" width="8" height="8" transform="rotate(45 6 6)" fill="none" stroke="var(--ink)" stroke-width="1.5"/></svg> Hijacked</span><span><svg width="14" height="12"><circle cx="6" cy="6" r="4.5" fill="var(--accent)"/></svg> Airline or FAA knew</span><span><svg width="14" height="12"><path d="M6 1 L11.5 11 H0.5 Z" fill="var(--hot)"/></svg> Military told</span><span><svg width="14" height="12"><path d="M2 2 L10 10 M10 2 L2 10" stroke="var(--crit)" stroke-width="2.5" fill="none"/></svg> Crashed</span></div>`;
+  s += `<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="Timeline of the four hijacked flights showing when each was hijacked, when civil aviation knew, when the military was told and when it crashed">`;
+  for (let m = 8 * 60; m <= 10 * 60; m += 15) s += `<line class="gridl" x1="${X(m)}" x2="${X(m)}" y1="6" y2="${4 * rowH + 6}"/><text x="${X(m)}" y="${H - 14}" text-anchor="middle">${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}</text>`;
+  D.forEach((d, i) => { const y = 34 + i * rowH, [nm, tg, to, hj, aw, ml, cr, note] = d;
+    s += `<text x="0" y="${y - 1}" style="fill:var(--ink);font-weight:600">${nm}</text><text x="0" y="${y + 13}">${tg}</text>`;
+    s += `<rect class="fl-bar" x="${X(to)}" y="${y - 5}" width="${X(cr) - X(to)}" height="10" rx="2"><title>${nm}: takeoff to crash</title></rect>`;
+    s += `<rect x="${X(hj) - 5}" y="${y - 5}" width="10" height="10" transform="rotate(45 ${X(hj)} ${y})" fill="var(--sheet)" stroke="var(--ink)" stroke-width="1.5"><title>Hijacked</title></rect>`;
+    s += `<circle cx="${X(aw)}" cy="${y}" r="5.5" fill="var(--accent)" stroke="var(--sheet)" stroke-width="2"><title>Airline or FAA knew</title></circle>`;
+    s += `<path d="M${X(ml)} ${y - 22} l6.5 11 h-13 Z" fill="var(--hot)" stroke="var(--sheet)" stroke-width="1"><title>Military told</title></path><line x1="${X(ml)}" x2="${X(ml)}" y1="${y - 11}" y2="${y - 6}" stroke="var(--hot)" stroke-width="1.5"/>`;
+    s += `<path d="M${X(cr) - 5} ${y - 5} l10 10 m0 -10 l-10 10" stroke="var(--crit)" stroke-width="3" fill="none"><title>Crashed</title></path>`;
+    s += `<text x="${Math.max(X(cr), X(ml)) + 14}" y="${y + 4}" style="fill:var(--ink)">${note}</text>`; });
+  host.innerHTML = s + '</svg>';
+}
+/* ---------- views ---------- */
+function showView(v, quiet) {
+  ['sim', 'calc', 'record'].forEach(k => { $('view-' + k).hidden = k !== v; });
+  document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
+  if (v !== 'sim') cancelAnimationFrame(sim.raf); else if (sim.phase !== 'ready' && sim.phase !== 'done') { sim.last = performance.now(); sim.raf = requestAnimationFrame(simTick); }
+  if (v === 'calc') render(); if (v === 'record') drawFlights(); if (v === 'sim') simDraw();
+  if (!quiet) try { history.replaceState(null, '', '#' + v); } catch (e) {}
+}
+function viewsInit() {
+  document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
+  const h = (location.hash || '').slice(1); showView(h === 'record' ? 'record' : (h === 'calc' || /^check-/.test(h)) ? 'calc' : 'sim', true);
+  window.addEventListener('resize', () => { if (!$('view-record').hidden) drawFlights(); });
+}
+start();
+</script>
+</body></html>

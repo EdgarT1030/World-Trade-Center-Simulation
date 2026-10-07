@@ -1,0 +1,137 @@
+[
+  {
+    "id": 1,
+    "citation": "NIST NCSTAR 1, Final Report on the Collapse of the World Trade Center Towers, September 2005. Building description, aircraft weight and fuel, impact damage, occupancy.",
+    "urls": [
+      "https://nvlpubs.nist.gov/nistpubs/Legacy/NCSTAR/ncstar1.pdf"
+    ]
+  },
+  {
+    "id": 2,
+    "citation": "NIST, FAQs: WTC Towers Investigation. Collapse cause, fire and steel temperatures, floor connection capacity, collapse times, seismic record, residue testing.",
+    "urls": [
+      "https://www.nist.gov/world-trade-center-investigation/study-faqs/wtc-towers-investigation"
+    ]
+  },
+  {
+    "id": 3,
+    "citation": "NIST technical briefing, F. Sadek, Aircraft Impact Damage Analysis, September 2005. Impact speeds (443 ± 30 and 542 ± 24 mph), severed-column counts.",
+    "urls": [
+      "https://www.nist.gov/system/files/documents/2017/05/09/3Fahim2.pdf"
+    ]
+  },
+  {
+    "id": 4,
+    "citation": "NIST technical briefing, K. Butler, Post-Impact Frequency Analysis, September 2005. Sway of WTC 2 after impact, 11.4-second period.",
+    "urls": [
+      "https://www.nist.gov/el/disasterstudies/wtc/upload/3Butler.pdf"
+    ]
+  },
+  {
+    "id": 5,
+    "citation": "NIST technical briefings, T. McAllister and J. Gross, structural response, probable collapse sequence and response to public comments, September 2005. Inward bowing measurements, wind neglected.",
+    "urls": [
+      "https://www.nist.gov/system/files/documents/2017/05/09/6McAllister.pdf",
+      "https://www.nist.gov/system/files/documents/2017/05/09/6McAllister2.pdf",
+      "https://www.nist.gov/document/project6finalpdf"
+    ]
+  },
+  {
+    "id": 6,
+    "citation": "NIST briefing, S. Sunder, NIST Response to the World Trade Center Disaster, October 2005. Design-wind drift (51 to 65 in at the top), occupancy.",
+    "urls": [
+      "https://www.nist.gov/document/sundernibs102405pdf"
+    ]
+  },
+  {
+    "id": 7,
+    "citation": "NIST briefing, K. McGrattan, Simulation of the Fires in WTC 1 and 2. Combustible load of 3 to 5 lb per sq ft, 4 as the realistic case.",
+    "urls": [
+      "https://www.nist.gov/system/files/documents/2017/05/09/P5SimulationofFiresinWTC1-2.pdf"
+    ]
+  },
+  {
+    "id": 8,
+    "citation": "NIST NISTIR 6879, Initial Model for Fires in the World Trade Center Towers, May 2002. Wind speed and direction, tower dimensions, heat release rate near one gigawatt, early fuel estimates.",
+    "urls": [
+      "https://www.nist.gov/document/wtctotalreptpdf"
+    ]
+  },
+  {
+    "id": 9,
+    "citation": "Engineering News-Record, Report Ties Trade Center Collapses to Column Failures, October 2002. The leaseholder's engineering study.",
+    "urls": [
+      "https://enr.com/articles/30309-report-ties-trade-center-collapses-to-column-failures-10-25-02"
+    ]
+  },
+  {
+    "id": 10,
+    "citation": "9/11 Commission Report, chapter 1, \"We Have Some Planes\". Flight and air defense timeline.",
+    "urls": [
+      "https://govinfo.library.unt.edu/911/report/911Report_Ch1.htm"
+    ]
+  },
+  {
+    "id": 11,
+    "citation": "9/11 Commission Report, chapter 8, \"The System Was Blinking Red\". Summer 2001 threat reporting, the August 6 brief, Phoenix memo, Moussaoui, watchlisting.",
+    "urls": [
+      "https://govinfo.library.unt.edu/911/report/911Report_Ch8.htm"
+    ]
+  },
+  {
+    "id": 12,
+    "citation": "9/11 Commission Report, chapter 11, \"Foresight and Hindsight\". Earlier aircraft-as-weapon warnings, missed opportunities, kinds of failure.",
+    "urls": [
+      "https://govinfo.library.unt.edu/911/report/911Report_Ch11.htm"
+    ]
+  },
+  {
+    "id": 13,
+    "citation": "NIST NCSTAR 1-3, Mechanical and Metallurgical Analysis of Structural Steel. Temperatures reached by recovered steel.",
+    "urls": [
+      "https://nvlpubs.nist.gov/nistpubs/Legacy/NCSTAR/ncstar1-3.pdf"
+    ]
+  },
+  {
+    "id": 14,
+    "citation": "National Security Archive, The President's Daily Brief of August 6, 2001. Declassification of the brief.",
+    "urls": [
+      "https://nsarchive2.gwu.edu/NSAEBB/NSAEBB116/index.htm"
+    ]
+  },
+  {
+    "id": 15,
+    "citation": "Snopes, quoting the 9/11 Commission on airline put options.",
+    "urls": [
+      "https://www.snopes.com/fact-check/put-paid"
+    ]
+  },
+  {
+    "id": 16,
+    "citation": "NBC News, Pentagon report refutes pre-9/11 intel claim, September 2006. Able Danger.",
+    "urls": [
+      "https://www.nbcnews.com/id/wbna14941373"
+    ]
+  },
+  {
+    "id": 17,
+    "citation": "ABC News 20/20, Were Israelis Detained on Sept. 11 Spies?, June 2002.",
+    "urls": [
+      "https://abcnews.com/2020/story?id=123885"
+    ]
+  },
+  {
+    "id": 18,
+    "citation": "Salon, The Israeli \"art student\" mystery, May 2002.",
+    "urls": [
+      "https://www.salon.com/2002/05/07/students/"
+    ]
+  },
+  {
+    "id": 19,
+    "citation": "StrategyPage, Intelligence: March 12, 2002. DEA confirmation of the memo and the FBI's denial of a spy ring.",
+    "urls": [
+      "https://www.strategypage.com/htmw/htintel/articles/20020312.aspx"
+    ]
+  }
+]
