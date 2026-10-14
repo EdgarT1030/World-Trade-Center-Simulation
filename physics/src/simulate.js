@@ -1,6 +1,7 @@
 import { U, TOWER, sway, fireEnergy, gasTemp, cSteel, columnAt, progression } from './physics.js';
 /* ---------- simulation model: one run precomputed from the calc-sheet formulas ---------- */
 const SIMK = { sagC: 600, stagger: 5, dtS: 5, peakC: 1000, lateC: 500, trussAV: 300, fy: 65 };
+const AMB4 = Math.pow(293, 4); /* (20+273)^4 — ambient radiation term, constant */
 const KE_ACTUAL = { wtc1: 0.5 * 283600 * U.LB * Math.pow(443 * U.MPH, 2), wtc2: 0.5 * 283600 * U.LB * Math.pow(542 * U.MPH, 2) };
 function wallGas(tRel, psf) {            /* gas temperature at the wall, minutes after the fire arrives there */
   if (tRel < 0) return 20;
@@ -27,12 +28,13 @@ function simulate(I) {
     const t = k * SIMK.dtS / 60;
     for (const s of st) {
       const Tg = wallGas(t - s.t0, I.loadPsf);
+      const Tg4 = Math.pow(Tg + 273, 4); /* hot-gas radiation term — shared by truss and column gain */
       /* floor truss: all sides in the fire */
-      if (s.bare || dIns <= 0) { const h = 25 * (Tg - s.truss) + 0.7 * sig * (Math.pow(Tg + 273, 4) - Math.pow(s.truss + 273, 4)); s.truss += h * SIMK.trussAV / (rho * cSteel(s.truss)) * SIMK.dtS; }
+      if (s.bare || dIns <= 0) { const h = 25 * (Tg - s.truss) + 0.7 * sig * (Tg4 - Math.pow(s.truss + 273, 4)); s.truss += h * SIMK.trussAV / (rho * cSteel(s.truss)) * SIMK.dtS; }
       else s.truss += (0.12 / dIns) * SIMK.trussAV * (Tg - s.truss) / (rho * cSteel(s.truss)) * SIMK.dtS;
       /* outer column: one face of four in the fire, three faces losing heat to outside air at 20 C */
-      const gain = (s.bare || dIns <= 0) ? 25 * (Tg - s.col) + 0.7 * sig * (Math.pow(Tg + 273, 4) - Math.pow(s.col + 273, 4)) : (0.12 / dIns) * (Tg - s.col);
-      const loss = 3 * (25 * (s.col - 20) + 0.7 * sig * (Math.pow(s.col + 273, 4) - Math.pow(293, 4)));
+      const gain = (s.bare || dIns <= 0) ? 25 * (Tg - s.col) + 0.7 * sig * (Tg4 - Math.pow(s.col + 273, 4)) : (0.12 / dIns) * (Tg - s.col);
+      const loss = 3 * (25 * (s.col - 20) + 0.7 * sig * (Math.pow(s.col + 273, 4) - AMB4));
       s.col += (gain - loss) / (4 * tw * rho * cSteel(s.col)) * SIMK.dtS;
       if (s.sagAt == null && s.truss >= SIMK.sagC) s.sagAt = t;
     }
